@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class ActivityTrackerScreen extends StatelessWidget {
-  const ActivityTrackerScreen({Key? key}) : super(key: key);
+  const ActivityTrackerScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -2,32 +2,8 @@ import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'dart:ui';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        fontFamily: 'SF Pro Display',
-        scaffoldBackgroundColor: const Color(0xFFF5F5F7),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-        ),
-      ),
-      home: const HealthDashboardScreen(),
-    );
-  }
-}
-
 class HealthDashboardScreen extends StatelessWidget {
-  const HealthDashboardScreen({Key? key}) : super(key: key);
+  const HealthDashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -80,9 +56,9 @@ class HealthDashboardScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          Column(
+          const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
+            children: [
               Text(
                 'Hi, Joseph',
                 style: TextStyle(
