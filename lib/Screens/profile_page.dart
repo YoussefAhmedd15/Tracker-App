@@ -44,21 +44,21 @@ class ProfilePage extends StatelessWidget {
               const SizedBox(height: 20),
 
               // Profile Info
-              Center(
+              const Center(
                 child: Column(
                   children: [
                     const CircleAvatar(
                       radius: 45,
-                      backgroundImage: NetworkImage(
-                        'https://i.pravatar.cc/150?img=3', // صورة مؤقتة
-                      ),
+                      backgroundImage: AssetImage('images/pp.jpg'),
                     ),
-                    const SizedBox(height: 12),
-                    const Text(
+
+
+                    SizedBox(height: 12),
+                    Text(
                       'Hello-Michael',
                       style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                     ),
-                    const Text(
+                    Text(
                       'michael_1508@world.com',
                       style: TextStyle(color: Colors.grey),
                     ),
