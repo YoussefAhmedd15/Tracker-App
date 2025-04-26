@@ -33,7 +33,7 @@ class FillProfilePage extends StatelessWidget {
             ),
             const SizedBox(height: 30),
 
-            // Profile Picture Section (Updated)
+            // Profile Picture Section
             Container(
               height: 140,
               width: double.infinity,
@@ -48,9 +48,7 @@ class FillProfilePage extends StatelessWidget {
                   children: [
                     const CircleAvatar(
                       radius: 45,
-                      backgroundImage: NetworkImage(
-                        'https://i.pravatar.cc/150?img=4',
-                      ),
+                      backgroundImage: AssetImage('images/pp.jpg'),
                     ),
                     Positioned(
                       bottom: -4,
@@ -89,7 +87,7 @@ class FillProfilePage extends StatelessWidget {
             const SizedBox(height: 16),
             const CustomTextField(label: 'Email', hintText: 'madisons@example.com'),
             const SizedBox(height: 16),
-            const CustomTextField(label: 'Mobile Number', hintText: '+123 567 89000'),
+            const CustomTextField(label: 'Password', hintText: '*******'),
 
             const SizedBox(height: 30),
 
