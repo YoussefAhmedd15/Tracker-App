@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'Screens/login_page.dart';
-
+import 'package:tracker/Screens/settings.dart';
 
 void main() {
   runApp(const MyApp());
@@ -9,17 +8,18 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Health Dashboard',
+      title: 'Tracker App',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        scaffoldBackgroundColor: Colors.white,
+        primaryColor: Colors.black,
+        fontFamily: 'SF Pro Display',
         useMaterial3: true,
       ),
-      home: const LoginPage(),
+      home: const SettingsPage(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
-
