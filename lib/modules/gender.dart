@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tracker/Screens/age.dart';
+import 'package:tracker/modules/age.dart';
 
 class GenderSelectionPage extends StatefulWidget {
   final Function(String)? onGenderSelected;

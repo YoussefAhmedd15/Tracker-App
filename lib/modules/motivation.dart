@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tracker/Screens/gender.dart';
+import 'package:tracker/modules/gender.dart';
 
 class WorkoutMotivationScreen extends StatelessWidget {
   const WorkoutMotivationScreen({super.key});

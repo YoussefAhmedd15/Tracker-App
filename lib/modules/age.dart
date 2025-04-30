@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tracker/Screens/weight.dart';
+import 'package:tracker/modules/weight.dart';
 
 class AgeSelectionPage extends StatefulWidget {
   final Function(int)? onAgeSelected;

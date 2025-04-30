@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tracker/Screens/settings.dart';
+import 'package:tracker/modules/settings.dart';
 
 void main() {
   runApp(const MyApp());
