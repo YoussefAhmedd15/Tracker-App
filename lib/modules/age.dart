@@ -43,7 +43,6 @@ class _AgeSelectionPageState extends State<AgeSelectionPage> {
     if (_scrollController.hasClients) {
       final itemExtent = 60.0;
       final screenWidth = MediaQuery.of(context).size.width;
-      final padding = (screenWidth - itemExtent) / 2;
       final offset = (selectedAge - minAge) * itemExtent;
 
       if (animate) {

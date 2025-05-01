@@ -4,6 +4,7 @@ import 'package:tracker/shared/styles/colors.dart';
 import 'package:tracker/shared/styles/fonts.dart';
 import 'package:tracker/layout/onboarding_layout.dart';
 import 'package:tracker/shared/components/sign_components.dart';
+import 'package:tracker/modules/health_dashboard.dart';
 
 class FillProfilePage extends StatelessWidget {
   final int? selectedWeight;
@@ -130,7 +131,13 @@ class FillProfilePage extends StatelessWidget {
       bottomButton: CustomButton(
         text: 'Start',
         onPressed: () {
-          // TODO: Save profile data and navigate to main app
+          // Navigate to the Health Dashboard Screen
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const HealthDashboardScreen(),
+            ),
+          );
         },
       ),
     );

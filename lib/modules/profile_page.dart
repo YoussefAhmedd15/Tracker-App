@@ -1,26 +1,102 @@
 import 'package:flutter/material.dart';
+import 'package:tracker/modules/health_dashboard.dart';
+import 'package:tracker/modules/settings.dart';
+import 'package:tracker/shared/components/bottom_nav_bar.dart';
+import 'package:tracker/modules/workout_screen.dart';
+import 'package:tracker/modules/challenge_screen.dart';
+import 'package:tracker/shared/components/custom_app_bar.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  int selectedIndex = 3; // Profile tab - updated index
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.grey,
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: ''),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.emoji_events_outlined), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.star_outline), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.favorite_border), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.more_horiz), label: ''),
-        ],
+      appBar: const CustomAppBar(
+        title: 'Profile',
+        time: '9:41',
+        showBackButton: false,
+      ),
+      bottomNavigationBar: CustomBottomNavBar(
+        selectedIndex: selectedIndex,
+        onItemSelected: (index) {
+          if (index == 0) {
+            // Home icon
+            Navigator.pushReplacement(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    const HealthDashboardScreen(),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  const begin = Offset(-1.0, 0.0);
+                  const end = Offset.zero;
+                  const curve = Curves.easeInOut;
+                  var tween = Tween(begin: begin, end: end)
+                      .chain(CurveTween(curve: curve));
+                  var offsetAnimation = animation.drive(tween);
+                  return SlideTransition(
+                      position: offsetAnimation, child: child);
+                },
+                transitionDuration: const Duration(milliseconds: 300),
+              ),
+            );
+          } else if (index == 1) {
+            // Trophy icon (challenges)
+            Navigator.pushReplacement(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    const ChallengeScreen(),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  const begin = Offset(1.0, 0.0);
+                  const end = Offset.zero;
+                  const curve = Curves.easeInOut;
+                  var tween = Tween(begin: begin, end: end)
+                      .chain(CurveTween(curve: curve));
+                  var offsetAnimation = animation.drive(tween);
+                  return SlideTransition(
+                      position: offsetAnimation, child: child);
+                },
+                transitionDuration: const Duration(milliseconds: 300),
+              ),
+            );
+          } else if (index == 2) {
+            // Heart icon (workout) - now index 2 instead of 3
+            Navigator.pushReplacement(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    const WorkoutScreen(),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  const begin = Offset(1.0, 0.0);
+                  const end = Offset.zero;
+                  const curve = Curves.easeInOut;
+                  var tween = Tween(begin: begin, end: end)
+                      .chain(CurveTween(curve: curve));
+                  var offsetAnimation = animation.drive(tween);
+                  return SlideTransition(
+                      position: offsetAnimation, child: child);
+                },
+                transitionDuration: const Duration(milliseconds: 300),
+              ),
+            );
+          } else {
+            setState(() {
+              selectedIndex = index;
+            });
+          }
+        },
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -28,27 +104,14 @@ class ProfilePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Profile',
-                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.add_circle_outline, size: 28),
-                    onPressed: () {},
-                  ),
-                ],
-              ),
+              // Header - removed since we added an AppBar
               const SizedBox(height: 20),
 
               // Profile Info
               const Center(
                 child: Column(
                   children: [
-                    const CircleAvatar(
+                    CircleAvatar(
                       radius: 45,
                       child: Icon(Icons.person, size: 45),
                     ),
@@ -104,10 +167,33 @@ class ProfilePage extends StatelessWidget {
               const SizedBox(height: 20),
 
               // Settings Cards
-              const SettingsCard(
-                  icon: Icons.settings,
-                  color: Colors.deepPurple,
-                  title: 'App settings'),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) =>
+                          const SettingsPage(),
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
+                        const begin = Offset(1.0, 0.0);
+                        const end = Offset.zero;
+                        const curve = Curves.easeInOut;
+                        var tween = Tween(begin: begin, end: end)
+                            .chain(CurveTween(curve: curve));
+                        var offsetAnimation = animation.drive(tween);
+                        return SlideTransition(
+                            position: offsetAnimation, child: child);
+                      },
+                      transitionDuration: const Duration(milliseconds: 300),
+                    ),
+                  );
+                },
+                child: const SettingsCard(
+                    icon: Icons.settings,
+                    color: Colors.deepPurple,
+                    title: 'App settings'),
+              ),
               const SettingsCard(
                   icon: Icons.insert_chart,
                   color: Colors.green,

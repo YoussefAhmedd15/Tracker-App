@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:ui';
+import 'package:tracker/shared/components/bottom_nav_bar.dart';
+import 'package:tracker/modules/health_dashboard.dart';
+import 'package:tracker/modules/profile_page.dart';
+import 'package:tracker/modules/workout_screen.dart';
+import 'package:tracker/modules/challenge_screen.dart';
+import 'package:tracker/shared/components/custom_app_bar.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -13,15 +19,20 @@ class _SettingsPageState extends State<SettingsPage> {
   bool notificationsEnabled = true;
   bool connectionAlertsEnabled = true;
   bool phoneCallsEnabled = false;
+  int selectedIndex = 3; // Updated to match profile tab index
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: const CustomAppBar(
+        title: 'Settings',
+        time: '9:41',
+        showBackButton: true,
+      ),
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -34,69 +45,102 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ),
             ),
-            _buildBottomNavBar(),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.blue.shade200,
-              image: const DecorationImage(
-                image: NetworkImage('https://picsum.photos/200'),
-                fit: BoxFit.cover,
+      bottomNavigationBar: CustomBottomNavBar(
+        selectedIndex: selectedIndex,
+        onItemSelected: (index) {
+          if (index == 0) {
+            // Home icon
+            Navigator.pushReplacement(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    const HealthDashboardScreen(),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  const begin = Offset(-1.0, 0.0);
+                  const end = Offset.zero;
+                  const curve = Curves.easeInOut;
+                  var tween = Tween(begin: begin, end: end)
+                      .chain(CurveTween(curve: curve));
+                  var offsetAnimation = animation.drive(tween);
+                  return SlideTransition(
+                      position: offsetAnimation, child: child);
+                },
+                transitionDuration: const Duration(milliseconds: 300),
               ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          const Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Settings',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
+            );
+          } else if (index == 1) {
+            // Trophy icon (challenges)
+            Navigator.pushReplacement(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    const ChallengeScreen(),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  const begin = Offset(1.0, 0.0);
+                  const end = Offset.zero;
+                  const curve = Curves.easeInOut;
+                  var tween = Tween(begin: begin, end: end)
+                      .chain(CurveTween(curve: curve));
+                  var offsetAnimation = animation.drive(tween);
+                  return SlideTransition(
+                      position: offsetAnimation, child: child);
+                },
+                transitionDuration: const Duration(milliseconds: 300),
               ),
-              Text(
-                'Customize your experience',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
-                ),
+            );
+          } else if (index == 2) {
+            // Heart icon (workout)
+            Navigator.pushReplacement(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    const WorkoutScreen(),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  const begin = Offset(1.0, 0.0);
+                  const end = Offset.zero;
+                  const curve = Curves.easeInOut;
+                  var tween = Tween(begin: begin, end: end)
+                      .chain(CurveTween(curve: curve));
+                  var offsetAnimation = animation.drive(tween);
+                  return SlideTransition(
+                      position: offsetAnimation, child: child);
+                },
+                transitionDuration: const Duration(milliseconds: 300),
               ),
-            ],
-          ),
-          const Spacer(),
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child:
-                const Icon(Icons.notifications_outlined, color: Colors.black),
-          ),
-        ],
+            );
+          } else if (index == 3) {
+            // Profile icon
+            Navigator.pushReplacement(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    const ProfilePage(),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  const begin = Offset(-1.0, 0.0);
+                  const end = Offset.zero;
+                  const curve = Curves.easeInOut;
+                  var tween = Tween(begin: begin, end: end)
+                      .chain(CurveTween(curve: curve));
+                  var offsetAnimation = animation.drive(tween);
+                  return SlideTransition(
+                      position: offsetAnimation, child: child);
+                },
+                transitionDuration: const Duration(milliseconds: 300),
+              ),
+            );
+          } else {
+            setState(() {
+              selectedIndex = index;
+            });
+          }
+        },
       ),
     );
   }
@@ -262,54 +306,6 @@ class _SettingsPageState extends State<SettingsPage> {
           onChanged: onChanged,
         ),
       ],
-    );
-  }
-
-  Widget _buildBottomNavBar() {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F7).withOpacity(0.8),
-        border: Border(
-          top: BorderSide(
-            color: Colors.grey.withOpacity(0.2),
-            width: 1.5,
-          ),
-        ),
-      ),
-      child: ClipRRect(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildNavItem(Icons.home_outlined, false),
-                _buildNavItem(Icons.emoji_events_outlined, false),
-                _buildNavItem(Icons.star_border_rounded, false),
-                _buildNavItem(Icons.favorite_border_rounded, false),
-                _buildNavItem(Icons.person_outline_rounded, true),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem(IconData icon, bool isSelected) {
-    return Container(
-      width: 50,
-      height: 50,
-      decoration: BoxDecoration(
-        color: isSelected ? Colors.black : Colors.transparent,
-        shape: BoxShape.circle,
-      ),
-      child: Icon(
-        icon,
-        color: isSelected ? Colors.white : Colors.grey,
-        size: 24,
-      ),
     );
   }
 }

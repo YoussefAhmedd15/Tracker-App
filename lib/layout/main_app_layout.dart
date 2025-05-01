@@ -1,0 +1,90 @@
+import 'package:flutter/material.dart';
+import 'package:tracker/shared/components/custom_app_bar.dart';
+import 'package:tracker/shared/components/bottom_nav_bar.dart';
+import 'package:tracker/modules/health_dashboard.dart';
+import 'package:tracker/modules/workout_screen.dart';
+import 'package:tracker/modules/challenge_screen.dart';
+import 'package:tracker/modules/profile_page.dart';
+
+class MainAppLayout extends StatelessWidget {
+  final String title;
+  final String time;
+  final bool showBackButton;
+  final int selectedIndex;
+  final Widget body;
+  final Function(int)? onIndexChanged;
+
+  const MainAppLayout({
+    Key? key,
+    required this.title,
+    required this.time,
+    required this.selectedIndex,
+    required this.body,
+    this.showBackButton = false,
+    this.onIndexChanged,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: CustomAppBar(
+        title: title,
+        time: time,
+        showBackButton: showBackButton,
+      ),
+      body: SafeArea(child: body),
+      bottomNavigationBar: CustomBottomNavBar(
+        selectedIndex: selectedIndex,
+        onItemSelected: (index) {
+          if (onIndexChanged != null) {
+            onIndexChanged!(index);
+          }
+
+          if (index != selectedIndex) {
+            _navigateToScreen(context, index);
+          }
+        },
+      ),
+    );
+  }
+
+  void _navigateToScreen(BuildContext context, int index) {
+    Widget screen;
+    switch (index) {
+      case 0:
+        screen = const HealthDashboardScreen();
+        break;
+      case 1:
+        screen = const ChallengeScreen();
+        break;
+      case 2:
+        screen = const WorkoutScreen();
+        break;
+      case 3:
+        screen = const ProfilePage();
+        break;
+      default:
+        screen = const HealthDashboardScreen();
+    }
+
+    Navigator.pushReplacement(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => screen,
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          Offset begin = index < selectedIndex
+              ? const Offset(-1.0, 0.0)
+              : const Offset(1.0, 0.0);
+          const end = Offset.zero;
+          const curve = Curves.easeInOut;
+          var tween =
+              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+          var offsetAnimation = animation.drive(tween);
+          return SlideTransition(position: offsetAnimation, child: child);
+        },
+        transitionDuration: const Duration(milliseconds: 300),
+      ),
+    );
+  }
+}

@@ -1,40 +1,59 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'dart:ui';
+import 'package:tracker/shared/components/bottom_nav_bar.dart';
+import 'package:tracker/modules/workout_screen.dart';
+import 'package:tracker/modules/profile_page.dart';
+import 'package:tracker/modules/challenge_screen.dart';
+import 'package:tracker/modules/activity_tracker.dart';
+import 'package:tracker/shared/components/custom_app_bar.dart';
+import 'package:tracker/layout/main_app_layout.dart';
+import 'package:tracker/layout/card_section_layout.dart';
 
-class HealthDashboardScreen extends StatelessWidget {
+class HealthDashboardScreen extends StatefulWidget {
   const HealthDashboardScreen({super.key});
 
   @override
+  State<HealthDashboardScreen> createState() => _HealthDashboardScreenState();
+}
+
+class _HealthDashboardScreenState extends State<HealthDashboardScreen> {
+  int selectedIndex = 0;
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Column(
-          children: [
-            _buildHeader(),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 16),
-                    _buildProgressCard(),
-                    const SizedBox(height: 16),
-                    _buildMetricsRow(),
-                    const SizedBox(height: 16),
-                    _buildStandingCard(),
-                    const SizedBox(height: 16),
-                    _buildBottomCards(),
-                    const SizedBox(height: 16),
-                  ],
-                ),
+    return MainAppLayout(
+      title: 'Health Dashboard',
+      time: '9:41',
+      selectedIndex: selectedIndex,
+      body: Column(
+        children: [
+          _buildHeader(),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Column(
+                children: [
+                  const SizedBox(height: 16),
+                  _buildProgressCard(),
+                  const SizedBox(height: 16),
+                  _buildMetricsRow(),
+                  const SizedBox(height: 16),
+                  _buildStandingCard(),
+                  const SizedBox(height: 16),
+                  _buildBottomCards(),
+                  const SizedBox(height: 16),
+                ],
               ),
             ),
-            _buildBottomNavBar(),
-          ],
-        ),
+          ),
+        ],
       ),
+      onIndexChanged: (index) {
+        setState(() {
+          selectedIndex = index;
+        });
+      },
     );
   }
 
@@ -116,106 +135,100 @@ class HealthDashboardScreen extends StatelessWidget {
   }
 
   Widget _buildProgressCard() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+    return CardSectionLayout(
+      title: 'Progress',
+      actionButton: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  const ActivityTrackerScreen(),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                const begin = Offset(1.0, 0.0);
+                const end = Offset.zero;
+                const curve = Curves.easeInOut;
+                var tween = Tween(begin: begin, end: end)
+                    .chain(CurveTween(curve: curve));
+                var offsetAnimation = animation.drive(tween);
+                return SlideTransition(position: offsetAnimation, child: child);
+              },
+              transitionDuration: const Duration(milliseconds: 300),
+            ),
+          );
+        },
+        child: Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.grey.shade100,
           ),
-        ],
+          child: const Icon(
+            Icons.arrow_outward,
+            size: 18,
+          ),
+        ),
       ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Progress',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+      content: SizedBox(
+        height: 200,
+        width: 200,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            CustomPaint(
+              size: const Size(200, 200),
+              painter: ProgressRingsPainter(),
+            ),
+            Positioned(
+              top: 60,
+              left: 70,
+              child: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: Colors.orange.shade100,
+                  shape: BoxShape.circle,
+                ),
+                child: const Text(
+                  '🏆',
+                  style: TextStyle(fontSize: 16),
                 ),
               ),
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
+            ),
+            Positioned(
+              bottom: 70,
+              left: 60,
+              child: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: const BoxDecoration(
+                  color: Colors.yellow,
                   shape: BoxShape.circle,
-                  color: Colors.grey.shade100,
+                ),
+                child: const Text(
+                  '💰',
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 50,
+              right: 60,
+              child: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: Colors.teal.shade200,
+                  shape: BoxShape.circle,
                 ),
                 child: const Icon(
-                  Icons.arrow_outward,
-                  size: 18,
+                  Icons.circle,
+                  size: 16,
+                  color: Colors.black,
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          SizedBox(
-            height: 200,
-            width: 200,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                CustomPaint(
-                  size: const Size(200, 200),
-                  painter: ProgressRingsPainter(),
-                ),
-                Positioned(
-                  top: 60,
-                  left: 70,
-                  child: Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: Colors.orange.shade100,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Text(
-                      '🏆',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  bottom: 70,
-                  left: 60,
-                  child: Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: const BoxDecoration(
-                      color: Colors.yellow,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Text(
-                      '💰',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  bottom: 50,
-                  right: 60,
-                  child: Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: Colors.teal.shade200,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.circle,
-                      size: 16,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-              ],
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -263,20 +276,10 @@ class HealthDashboardScreen extends StatelessWidget {
     required String title,
     required String value,
   }) {
-    return Container(
+    return CardSectionLayout(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
+      borderRadius: 20,
+      content: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
@@ -478,62 +481,6 @@ class HealthDashboardScreen extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildBottomNavBar() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Container(
-        height: 70,
-        decoration: BoxDecoration(
-          color: const Color(0xFFF5F5F7).withOpacity(0.8),
-          borderRadius: BorderRadius.circular(40),
-          border: Border.all(
-            color: Colors.grey.withOpacity(0.2),
-            width: 1.5,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(40),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildNavItem(Icons.home_outlined, true),
-                _buildNavItem(Icons.emoji_events_outlined, false),
-                _buildNavItem(Icons.star_border_rounded, false),
-                _buildNavItem(Icons.favorite_border_rounded, false),
-                _buildNavItem(Icons.person_outline_rounded, false),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem(IconData icon, bool isSelected) {
-    return Container(
-      width: 50,
-      height: 50,
-      decoration: BoxDecoration(
-        color: isSelected ? Colors.black : Colors.transparent,
-        shape: BoxShape.circle,
-      ),
-      child: Icon(
-        icon,
-        color: isSelected ? Colors.white : Colors.grey,
-        size: 24,
-      ),
     );
   }
 }

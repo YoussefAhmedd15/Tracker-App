@@ -1,13 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:tracker/shared/components/header_section.dart';
+import 'package:tracker/shared/components/bottom_nav_bar.dart';
+import 'package:tracker/shared/components/metric_card.dart';
+import 'package:tracker/shared/components/circular_icon_button.dart';
+import 'package:tracker/shared/components/custom_app_bar.dart';
+import 'package:tracker/modules/workout_screen.dart';
+import 'package:tracker/modules/health_dashboard.dart';
+import 'package:tracker/modules/challenge_screen.dart';
+import 'package:tracker/modules/profile_page.dart';
 
-class ActivityTrackerScreen extends StatelessWidget {
+class ActivityTrackerScreen extends StatefulWidget {
   const ActivityTrackerScreen({super.key});
+
+  @override
+  State<ActivityTrackerScreen> createState() => _ActivityTrackerScreenState();
+}
+
+class _ActivityTrackerScreenState extends State<ActivityTrackerScreen> {
+  int selectedDateIndex = 3;
+  int bottomNavIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: CustomAppBar(
+        title: 'Activity Tracker',
+        time: '9:41',
+        showBackButton: true,
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -15,7 +37,13 @@ class ActivityTrackerScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 16),
-              _buildHeader(),
+              HeaderSection(
+                title: 'Activity Tracker',
+                rightWidget: CircularIconButton(
+                  icon: Icons.add,
+                  onPressed: null,
+                ),
+              ),
               const SizedBox(height: 24),
               _buildDateSelector(),
               const SizedBox(height: 24),
@@ -35,66 +63,100 @@ class ActivityTrackerScreen extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, -2),
-            ),
-          ],
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildNavItem(Icons.home_rounded, true),
-                _buildNavItem(Icons.emoji_events_rounded, false),
-                _buildNavItem(Icons.star_rounded, false),
-                _buildNavItem(Icons.favorite_rounded, false),
-                _buildNavItem(Icons.person_rounded, false),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        const Text(
-          'Activity Tracker',
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(50),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 10,
-                offset: const Offset(0, 2),
+      bottomNavigationBar: CustomBottomNavBar(
+        selectedIndex: bottomNavIndex,
+        onItemSelected: (index) {
+          if (index == 0 && bottomNavIndex != index) {
+            // Home icon
+            Navigator.pushReplacement(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    const HealthDashboardScreen(),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  const begin = Offset(-1.0, 0.0);
+                  const end = Offset.zero;
+                  const curve = Curves.easeInOut;
+                  var tween = Tween(begin: begin, end: end)
+                      .chain(CurveTween(curve: curve));
+                  var offsetAnimation = animation.drive(tween);
+                  return SlideTransition(
+                      position: offsetAnimation, child: child);
+                },
+                transitionDuration: const Duration(milliseconds: 300),
               ),
-            ],
-          ),
-          child: IconButton(
-            icon: const Icon(Icons.add, color: Colors.black),
-            onPressed: () {},
-          ),
-        ),
-      ],
+            );
+          } else if (index == 1 && bottomNavIndex != index) {
+            // Trophy icon (challenges)
+            Navigator.pushReplacement(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    const ChallengeScreen(),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  const begin = Offset(1.0, 0.0);
+                  const end = Offset.zero;
+                  const curve = Curves.easeInOut;
+                  var tween = Tween(begin: begin, end: end)
+                      .chain(CurveTween(curve: curve));
+                  var offsetAnimation = animation.drive(tween);
+                  return SlideTransition(
+                      position: offsetAnimation, child: child);
+                },
+                transitionDuration: const Duration(milliseconds: 300),
+              ),
+            );
+          } else if (index == 2 && bottomNavIndex != index) {
+            // Heart icon (workout)
+            Navigator.pushReplacement(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    const WorkoutScreen(),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  const begin = Offset(1.0, 0.0);
+                  const end = Offset.zero;
+                  const curve = Curves.easeInOut;
+                  var tween = Tween(begin: begin, end: end)
+                      .chain(CurveTween(curve: curve));
+                  var offsetAnimation = animation.drive(tween);
+                  return SlideTransition(
+                      position: offsetAnimation, child: child);
+                },
+                transitionDuration: const Duration(milliseconds: 300),
+              ),
+            );
+          } else if (index == 3 && bottomNavIndex != index) {
+            // Profile icon
+            Navigator.pushReplacement(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    const ProfilePage(),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  const begin = Offset(1.0, 0.0);
+                  const end = Offset.zero;
+                  const curve = Curves.easeInOut;
+                  var tween = Tween(begin: begin, end: end)
+                      .chain(CurveTween(curve: curve));
+                  var offsetAnimation = animation.drive(tween);
+                  return SlideTransition(
+                      position: offsetAnimation, child: child);
+                },
+                transitionDuration: const Duration(milliseconds: 300),
+              ),
+            );
+          } else {
+            setState(() {
+              bottomNavIndex = index;
+            });
+          }
+        },
+      ),
     );
   }
 
@@ -153,23 +215,23 @@ class ActivityTrackerScreen extends StatelessWidget {
       children: [
         Row(
           children: [
-            Expanded(
-              child: _buildMetricCard(
-                'Steps',
-                '8,546',
-                'steps',
-                Icons.directions_walk,
-                Colors.blue,
+            const Expanded(
+              child: MetricCard(
+                title: 'Steps',
+                value: '8,546',
+                unit: 'steps',
+                icon: Icons.directions_walk,
+                color: Colors.blue,
               ),
             ),
             const SizedBox(width: 16),
-            Expanded(
-              child: _buildMetricCard(
-                'Calories',
-                '259',
-                'kcal',
-                Icons.local_fire_department,
-                Colors.orange,
+            const Expanded(
+              child: MetricCard(
+                title: 'Calories',
+                value: '259',
+                unit: 'kcal',
+                icon: Icons.local_fire_department,
+                color: Colors.orange,
               ),
             ),
           ],
@@ -177,84 +239,28 @@ class ActivityTrackerScreen extends StatelessWidget {
         const SizedBox(height: 16),
         Row(
           children: [
-            Expanded(
-              child: _buildMetricCard(
-                'Heart Rate',
-                '85',
-                'bpm',
-                Icons.favorite,
-                Colors.red,
+            const Expanded(
+              child: MetricCard(
+                title: 'Heart Rate',
+                value: '85',
+                unit: 'bpm',
+                icon: Icons.favorite,
+                color: Colors.red,
               ),
             ),
             const SizedBox(width: 16),
-            Expanded(
-              child: _buildMetricCard(
-                'Sleep',
-                '7h 30m',
-                'sleep',
-                Icons.nightlight_round,
-                Colors.purple,
+            const Expanded(
+              child: MetricCard(
+                title: 'Sleep',
+                value: '7h 30m',
+                unit: 'sleep',
+                icon: Icons.nightlight_round,
+                color: Colors.purple,
               ),
             ),
           ],
         ),
       ],
-    );
-  }
-
-  Widget _buildMetricCard(
-    String title,
-    String value,
-    String unit,
-    IconData icon,
-    Color color,
-  ) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(icon, color: color),
-              const SizedBox(width: 8),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Text(
-            unit,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.grey,
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -264,10 +270,7 @@ class ActivityTrackerScreen extends StatelessWidget {
       children: [
         const Text(
           'Statistics',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 16),
         Container(
@@ -308,7 +311,7 @@ class ActivityTrackerScreen extends StatelessWidget {
                         'Thu',
                         'Fri',
                         'Sat',
-                        'Sun'
+                        'Sun',
                       ];
                       return Text(
                         days[value.toInt()],
@@ -347,21 +350,6 @@ class ActivityTrackerScreen extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildNavItem(IconData icon, bool isSelected) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: isSelected ? Colors.black : Colors.transparent,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Icon(
-        icon,
-        color: isSelected ? Colors.white : Colors.black54,
-        size: 28,
-      ),
     );
   }
 }
