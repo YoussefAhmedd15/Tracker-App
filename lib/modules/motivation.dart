@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:tracker/modules/gender.dart';
-<<<<<<< HEAD
 import 'package:tracker/shared/styles/colors.dart';
 import 'package:tracker/shared/styles/fonts.dart';
-import 'package:tracker/shared/layouts/onboarding_layout.dart';
+import 'package:tracker/layout/onboarding_layout.dart';
 import 'package:tracker/shared/components/sign_components.dart';
-=======
->>>>>>> a2641305b9b8c01caec731f0e68e7f4725cd39e0
 
 class WorkoutMotivationScreen extends StatelessWidget {
   const WorkoutMotivationScreen({super.key});

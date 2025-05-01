@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tracker/shared/styles/colors.dart';
 import 'package:tracker/shared/styles/fonts.dart';
 import 'package:tracker/modules/height_picker_page.dart';
-import 'package:tracker/shared/layouts/onboarding_layout.dart';
+import 'package:tracker/layout/onboarding_layout.dart';
 import 'package:tracker/shared/components/sign_components.dart';
 
 class WeightSelectionPage extends StatefulWidget {
