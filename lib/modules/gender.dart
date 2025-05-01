@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:tracker/Screens/age.dart';
+import 'package:tracker/modules/age.dart';
+import 'package:tracker/shared/styles/colors.dart';
+import 'package:tracker/shared/styles/fonts.dart';
+import 'package:tracker/shared/layouts/onboarding_layout.dart';
+import 'package:tracker/shared/components/sign_components.dart';
 
 class GenderSelectionPage extends StatefulWidget {
   final Function(String)? onGenderSelected;
@@ -52,6 +56,9 @@ class _GenderSelectionPageState extends State<GenderSelectionPage>
       MaterialPageRoute(
         builder: (context) => AgeSelectionPage(
           onAgeSelected: (age) {
+            if (widget.onGenderSelected != null) {
+              widget.onGenderSelected!(selectedGender!);
+            }
             Navigator.pop(context, age);
           },
           onBackPressed: () => Navigator.pop(context),
@@ -62,149 +69,73 @@ class _GenderSelectionPageState extends State<GenderSelectionPage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return OnboardingLayout(
+      onBackPressed: () {
+        if (widget.onBackPressed != null) {
+          widget.onBackPressed!();
+        } else {
+          Navigator.pop(context);
+        }
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header with enhanced design
+          const Text(
+            "What's Your\nGender?",
+            style: AppTextStyles.heading1,
+          ),
+
+          const SizedBox(height: 16),
+
+          // Info text with enhanced design
+          const InfoBox(
+            text:
+                'Help us create a personalized experience for your fitness journey',
+          ),
+
+          SizedBox(height: MediaQuery.of(context).size.height * 0.08),
+
+          // Gender options in a row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              // Back Button with custom design
-              Padding(
-                padding: const EdgeInsets.only(top: 16.0, bottom: 32.0),
-                child: GestureDetector(
-                  onTap: widget.onBackPressed ?? () => Navigator.pop(context),
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: const Icon(
-                      Icons.arrow_back,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                  ),
-                ),
+              _buildGenderOption(
+                'male',
+                Icons.male,
+                'Male',
+                AppColors.backgroundGrey,
+                selectedBorderColor: AppColors.accent,
               ),
-
-              // Header with enhanced design
-              const Text(
-                "What's Your\nGender?",
-                style: TextStyle(
-                  fontSize: 40,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                  height: 1.2,
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              // Info text with enhanced design
-              Container(
-                width: double.infinity,
-                padding:
-                    const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-                decoration: BoxDecoration(
-                  color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: const Text(
-                  'Help us create a personalized experience for your fitness journey',
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                    color: Colors.black87,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    height: 1.5,
-                  ),
-                ),
-              ),
-
-              SizedBox(height: MediaQuery.of(context).size.height * 0.08),
-
-              // Gender options in a row
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildGenderOption(
-                    'male',
-                    Icons.male,
-                    'Male',
-                    Colors.grey[200]!,
-                    selectedBorderColor: Colors.yellow,
-                  ),
-                  _buildGenderOption(
-                    'female',
-                    Icons.female,
-                    'Female',
-                    Colors.grey[200]!,
-                    selectedBorderColor: Colors.yellow,
-                  ),
-                ],
-              ),
-
-              const Spacer(),
-
-              // Continue button with enhanced design
-              Padding(
-                padding: const EdgeInsets.only(bottom: 32.0),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 60,
-                  child: ElevatedButton(
-                    onPressed: selectedGender != null
-                        ? () {
-                            if (widget.onGenderSelected != null) {
-                              widget.onGenderSelected!(selectedGender!);
-                            }
-                            _navigateToAgeSelection();
-                          }
-                        : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: selectedGender != null
-                          ? Colors.black
-                          : Colors.grey[300],
-                      disabledBackgroundColor: Colors.grey[300],
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: Text(
-                      'Continue',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: selectedGender != null
-                            ? Colors.white
-                            : Colors.grey[600],
-                      ),
-                    ),
-                  ),
-                ),
+              _buildGenderOption(
+                'female',
+                Icons.female,
+                'Female',
+                AppColors.backgroundGrey,
+                selectedBorderColor: AppColors.accent,
               ),
             ],
           ),
-        ),
+
+          const Spacer(),
+
+          // Continue button with enhanced design
+          Padding(
+            padding: const EdgeInsets.only(bottom: 32.0),
+            child: CustomButton(
+              text: 'Continue',
+              onPressed: selectedGender != null
+                  ? () {
+                      if (widget.onGenderSelected != null) {
+                        widget.onGenderSelected!(selectedGender!);
+                      }
+                      _navigateToAgeSelection();
+                    }
+                  : () {},
+              isEnabled: selectedGender != null,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -231,17 +162,17 @@ class _GenderSelectionPageState extends State<GenderSelectionPage>
                   width: 140,
                   height: 140,
                   decoration: BoxDecoration(
-                    color: isSelected ? Colors.black : color,
+                    color: isSelected ? AppColors.buttonBackground : color,
                     shape: BoxShape.circle,
                     border: Border.all(
                       color: isSelected
-                          ? (selectedBorderColor ?? Colors.white)
+                          ? (selectedBorderColor ?? AppColors.buttonText)
                           : Colors.transparent,
                       width: 3,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: AppColors.shadow,
                         blurRadius: isSelected ? 12 : 4,
                         spreadRadius: isSelected ? 2 : 0,
                       ),
@@ -251,16 +182,18 @@ class _GenderSelectionPageState extends State<GenderSelectionPage>
                     child: Icon(
                       icon,
                       size: 60,
-                      color: isSelected ? Colors.yellow : Colors.black87,
+                      color:
+                          isSelected ? AppColors.accent : AppColors.textPrimary,
                     ),
                   ),
                 ),
                 const SizedBox(height: 16),
                 Text(
                   label,
-                  style: TextStyle(
-                    color: isSelected ? Colors.black : Colors.grey[600],
-                    fontSize: 20,
+                  style: AppTextStyles.bodyLarge.copyWith(
+                    color: isSelected
+                        ? AppColors.textPrimary
+                        : AppColors.textSecondary,
                     fontWeight:
                         isSelected ? FontWeight.bold : FontWeight.normal,
                   ),

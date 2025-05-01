@@ -15,7 +15,8 @@ class ProfilePage extends StatelessWidget {
         type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.emoji_events_outlined), label: ''),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.emoji_events_outlined), label: ''),
           BottomNavigationBarItem(icon: Icon(Icons.star_outline), label: ''),
           BottomNavigationBarItem(icon: Icon(Icons.favorite_border), label: ''),
           BottomNavigationBarItem(icon: Icon(Icons.more_horiz), label: ''),
@@ -49,14 +50,13 @@ class ProfilePage extends StatelessWidget {
                   children: [
                     const CircleAvatar(
                       radius: 45,
-                      backgroundImage: AssetImage('images/pp.jpg'),
+                      child: Icon(Icons.person, size: 45),
                     ),
-
-
                     SizedBox(height: 12),
                     Text(
                       'Hello-Michael',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                     ),
                     Text(
                       'michael_1508@world.com',
@@ -70,7 +70,8 @@ class ProfilePage extends StatelessWidget {
 
               // Competition Card
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                 decoration: BoxDecoration(
                   color: const Color(0xFFF6F6F6),
                   borderRadius: BorderRadius.circular(16),
@@ -83,9 +84,12 @@ class ProfilePage extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Competition', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                          Text('Competition',
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.w600)),
                           SizedBox(height: 4),
-                          Text('Start a competition', style: TextStyle(color: Colors.grey)),
+                          Text('Start a competition',
+                              style: TextStyle(color: Colors.grey)),
                         ],
                       ),
                     ),
@@ -100,10 +104,22 @@ class ProfilePage extends StatelessWidget {
               const SizedBox(height: 20),
 
               // Settings Cards
-              const SettingsCard(icon: Icons.settings, color: Colors.deepPurple, title: 'App settings'),
-              const SettingsCard(icon: Icons.insert_chart, color: Colors.green, title: 'Third-party data'),
-              const SettingsCard(icon: Icons.devices_other, color: Colors.teal, title: 'Devices permission'),
-              const SettingsCard(icon: Icons.security, color: Colors.green, title: 'App permission'),
+              const SettingsCard(
+                  icon: Icons.settings,
+                  color: Colors.deepPurple,
+                  title: 'App settings'),
+              const SettingsCard(
+                  icon: Icons.insert_chart,
+                  color: Colors.green,
+                  title: 'Third-party data'),
+              const SettingsCard(
+                  icon: Icons.devices_other,
+                  color: Colors.teal,
+                  title: 'Devices permission'),
+              const SettingsCard(
+                  icon: Icons.security,
+                  color: Colors.green,
+                  title: 'App permission'),
             ],
           ),
         ),
@@ -142,7 +158,9 @@ class SettingsCard extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+            child: Text(title,
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
           ),
           const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
         ],

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:tracker/Screens/gender.dart';
+import 'package:tracker/modules/gender.dart';
+import 'package:tracker/shared/styles/colors.dart';
+import 'package:tracker/shared/styles/fonts.dart';
+import 'package:tracker/shared/layouts/onboarding_layout.dart';
+import 'package:tracker/shared/components/sign_components.dart';
 
 class WorkoutMotivationScreen extends StatelessWidget {
   const WorkoutMotivationScreen({super.key});
@@ -7,7 +11,7 @@ class WorkoutMotivationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       body: Stack(
         fit: StackFit.expand,
         children: [
@@ -26,12 +30,42 @@ class WorkoutMotivationScreen extends StatelessWidget {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Colors.black.withOpacity(0.3),
-                  Colors.black.withOpacity(0.8),
+                  AppColors.primary.withOpacity(0.3),
+                  AppColors.primary.withOpacity(0.8),
                 ],
               ),
             ),
           ),
+          // Back Button
+          Positioned(
+            top: 16,
+            left: 16,
+            child: IconButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              icon: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.buttonBackground,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.shadow,
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.arrow_back,
+                  color: AppColors.buttonText,
+                  size: 24,
+                ),
+              ),
+            ),
+          ),
+          // Content
           SafeArea(
             child: Column(
               children: [
@@ -45,19 +79,7 @@ class WorkoutMotivationScreen extends StatelessWidget {
                       Text(
                         'Consistency Is\nThe Key To Progress.\nDon\'t Give Up!',
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.yellow,
-                          height: 1.2,
-                          shadows: [
-                            Shadow(
-                              offset: const Offset(0, 1),
-                              blurRadius: 3.0,
-                              color: Colors.black.withOpacity(0.2),
-                            ),
-                          ],
-                        ),
+                        style: AppTextStyles.motivationalText,
                       ),
                     ],
                   ),
@@ -69,14 +91,14 @@ class WorkoutMotivationScreen extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 32, vertical: 32),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.background,
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(40),
                       topRight: Radius.circular(40),
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: AppColors.shadow,
                         blurRadius: 10,
                         offset: const Offset(0, -2),
                       ),
@@ -87,11 +109,7 @@ class WorkoutMotivationScreen extends StatelessWidget {
                       Text(
                         'Every rep brings you closer to your goals. Remember, your body achieves what your mind believes. Make today\'s workout the reason for tomorrow\'s strength.',
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.grey[800],
-                          height: 1.5,
-                        ),
+                        style: AppTextStyles.motivationalQuote,
                       ),
                       const SizedBox(height: 40),
                       // Next Button
@@ -99,9 +117,10 @@ class WorkoutMotivationScreen extends StatelessWidget {
                         width: double.infinity,
                         height: 60,
                         margin: const EdgeInsets.symmetric(horizontal: 24),
-                        child: ElevatedButton(
+                        child: CustomButton(
+                          text: 'Next',
                           onPressed: () {
-                            Navigator.pushReplacement(
+                            Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
@@ -109,21 +128,6 @@ class WorkoutMotivationScreen extends StatelessWidget {
                               ),
                             );
                           },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 0,
-                          ),
-                          child: const Text(
-                            'Next',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
                         ),
                       ),
                       const SizedBox(height: 16),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:tracker/Screens/settings.dart';
+import 'package:tracker/modules/login_page.dart';
+import 'package:tracker/modules/motivation.dart';
+import 'package:tracker/modules/settings.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,7 +20,7 @@ class MyApp extends StatelessWidget {
         fontFamily: 'SF Pro Display',
         useMaterial3: true,
       ),
-      home: const SettingsPage(),
+      home: const LoginPage(),
       debugShowCheckedModeBanner: false,
     );
   }

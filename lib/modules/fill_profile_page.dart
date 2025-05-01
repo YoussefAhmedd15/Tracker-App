@@ -1,114 +1,136 @@
 import 'package:flutter/material.dart';
+import 'package:tracker/shared/styles/colors.dart';
+import 'package:tracker/shared/styles/fonts.dart';
+import 'package:tracker/shared/layouts/auth_layout.dart';
+import 'package:tracker/shared/components/sign_components.dart';
 
 class FillProfilePage extends StatelessWidget {
-  const FillProfilePage({super.key});
+  final int? selectedWeight;
+  final int? selectedHeight;
+
+  const FillProfilePage({
+    super.key,
+    this.selectedWeight,
+    this.selectedHeight,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        child: Column(
-          children: [
-            const Text(
-              'Fill Your Profile',
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
-            const Text(
-              'Please fill in your details below to complete your profile.',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey),
-            ),
-            const SizedBox(height: 30),
-
-            // Profile Picture Section
-            Container(
-              height: 140,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: const Color(0xF3EDE7F6),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Center(
-                child: Stack(
-                  alignment: Alignment.center,
-                  clipBehavior: Clip.none,
-                  children: [
-                    const CircleAvatar(
-                      radius: 45,
-                      backgroundImage: AssetImage('images/pp.jpg'),
+    return AuthLayout(
+      title: 'Fill Your Profile',
+      subtitle: 'Please fill in your details below to complete your profile.',
+      children: [
+        // Profile Picture Section
+        Container(
+          height: 140,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: AppColors.avatarBackground,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Center(
+            child: Stack(
+              alignment: Alignment.center,
+              clipBehavior: Clip.none,
+              children: [
+                const CircleAvatar(
+                  radius: 45,
+                  backgroundImage: AssetImage('images/pp.jpg'),
+                ),
+                Positioned(
+                  bottom: -4,
+                  right: -4,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: AppColors.background,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.shadow,
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
-                    Positioned(
-                      bottom: -4,
-                      right: -4,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.edit,
-                          size: 18,
-                          color: Colors.black,
-                        ),
-                      ),
+                    child: const Icon(
+                      Icons.edit,
+                      size: 18,
+                      color: AppColors.iconColor,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 30),
+        // Form Fields
+        const CustomTextField(
+          label: 'Full Name',
+          hintText: 'Madison Smith',
+        ),
+        const SizedBox(height: 16),
+        const CustomTextField(
+          label: 'Nickname',
+          hintText: 'Madison',
+        ),
+        const SizedBox(height: 16),
+        const CustomTextField(
+          label: 'Email',
+          hintText: 'madisons@example.com',
+        ),
+        const SizedBox(height: 16),
+        const CustomTextField(
+          label: 'Password',
+          hintText: '*******',
+          obscureText: true,
+        ),
+        const SizedBox(height: 16),
+        // Display selected weight and height
+        if (selectedWeight != null && selectedHeight != null)
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.backgroundGrey,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Column(
+                  children: [
+                    Text(
+                      '$selectedWeight',
+                      style: AppTextStyles.numberLarge,
+                    ),
+                    const Text(
+                      'Weight (kg)',
+                      style: AppTextStyles.bodySmall,
                     ),
                   ],
                 ),
-              ),
-            ),
-
-            const SizedBox(height: 30),
-
-            // Form Fields
-            const CustomTextField(label: 'Full Name', hintText: 'Madison Smith'),
-            const SizedBox(height: 16),
-            const CustomTextField(label: 'Nickname', hintText: 'Madison'),
-            const SizedBox(height: 16),
-            const CustomTextField(label: 'Email', hintText: 'madisons@example.com'),
-            const SizedBox(height: 16),
-            const CustomTextField(label: 'Password', hintText: '*******'),
-
-            const SizedBox(height: 30),
-
-            // Start Button
-            SizedBox(
-              width: double.infinity,
-              height: 55,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                Column(
+                  children: [
+                    Text(
+                      '$selectedHeight',
+                      style: AppTextStyles.numberLarge,
+                    ),
+                    const Text(
+                      'Height (cm)',
+                      style: AppTextStyles.bodySmall,
+                    ),
+                  ],
                 ),
-                onPressed: () {},
-                child: const Text(
-                  'Start',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-                ),
-              ),
+              ],
             ),
-          ],
-        ),
+          ),
+      ],
+      bottomButton: CustomButton(
+        text: 'Start',
+        onPressed: () {
+          // TODO: Save profile data and navigate to main app
+        },
       ),
     );
   }
@@ -117,8 +139,14 @@ class FillProfilePage extends StatelessWidget {
 class CustomTextField extends StatelessWidget {
   final String label;
   final String hintText;
+  final bool obscureText;
 
-  const CustomTextField({super.key, required this.label, required this.hintText});
+  const CustomTextField({
+    super.key,
+    required this.label,
+    required this.hintText,
+    this.obscureText = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -127,19 +155,20 @@ class CustomTextField extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.black),
+          style: AppTextStyles.inputLabel,
         ),
         const SizedBox(height: 8),
         TextField(
           decoration: InputDecoration(
             hintText: hintText,
             filled: true,
-            fillColor: const Color(0xFFF6F6F6),
+            fillColor: AppColors.backgroundGrey,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
             ),
           ),
+          obscureText: obscureText,
         ),
       ],
     );
