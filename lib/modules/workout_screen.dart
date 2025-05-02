@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tracker/shared/components/workout_top_card.dart';
-import 'package:tracker/shared/components/progress_card.dart';
-import 'package:tracker/shared/components/muscle_section.dart';
+import 'package:tracker/shared/components/components.dart';
 import 'package:tracker/layout/main_app_layout.dart';
 
 class WorkoutScreen extends StatefulWidget {

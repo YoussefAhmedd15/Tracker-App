@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tracker/shared/components/custom_app_bar.dart';
-import 'package:tracker/shared/components/bottom_nav_bar.dart';
+import 'package:tracker/shared/components/components.dart';
 import 'package:tracker/modules/health_dashboard.dart';
 import 'package:tracker/modules/workout_screen.dart';
 import 'package:tracker/modules/challenge_screen.dart';
@@ -13,6 +12,8 @@ class MainAppLayout extends StatelessWidget {
   final int selectedIndex;
   final Widget body;
   final Function(int)? onIndexChanged;
+  final EdgeInsetsGeometry contentPadding;
+  final bool navigateOnTabChange;
 
   const MainAppLayout({
     Key? key,
@@ -22,6 +23,8 @@ class MainAppLayout extends StatelessWidget {
     required this.body,
     this.showBackButton = false,
     this.onIndexChanged,
+    this.contentPadding = EdgeInsets.zero,
+    this.navigateOnTabChange = true,
   }) : super(key: key);
 
   @override
@@ -33,7 +36,12 @@ class MainAppLayout extends StatelessWidget {
         time: time,
         showBackButton: showBackButton,
       ),
-      body: SafeArea(child: body),
+      body: SafeArea(
+        child: Padding(
+          padding: contentPadding,
+          child: body,
+        ),
+      ),
       bottomNavigationBar: CustomBottomNavBar(
         selectedIndex: selectedIndex,
         onItemSelected: (index) {
@@ -41,7 +49,7 @@ class MainAppLayout extends StatelessWidget {
             onIndexChanged!(index);
           }
 
-          if (index != selectedIndex) {
+          if (navigateOnTabChange && index != selectedIndex) {
             _navigateToScreen(context, index);
           }
         },

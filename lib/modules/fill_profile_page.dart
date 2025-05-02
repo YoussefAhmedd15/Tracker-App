@@ -3,7 +3,7 @@ import 'package:tracker/layout/auth_layout.dart';
 import 'package:tracker/shared/styles/colors.dart';
 import 'package:tracker/shared/styles/fonts.dart';
 import 'package:tracker/layout/onboarding_layout.dart';
-import 'package:tracker/shared/components/sign_components.dart';
+import 'package:tracker/shared/components/components.dart';
 import 'package:tracker/modules/health_dashboard.dart';
 
 class FillProfilePage extends StatelessWidget {

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:tracker/modules/health_dashboard.dart';
 import 'package:tracker/modules/settings.dart';
-import 'package:tracker/shared/components/bottom_nav_bar.dart';
+import 'package:tracker/shared/components/components.dart';
 import 'package:tracker/modules/workout_screen.dart';
 import 'package:tracker/modules/challenge_screen.dart';
-import 'package:tracker/shared/components/custom_app_bar.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});

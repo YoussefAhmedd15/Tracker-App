@@ -3,7 +3,7 @@ import 'package:tracker/modules/weight.dart';
 import 'package:tracker/shared/styles/colors.dart';
 import 'package:tracker/shared/styles/fonts.dart';
 import 'package:tracker/layout/onboarding_layout.dart';
-import 'package:tracker/shared/components/sign_components.dart';
+import 'package:tracker/shared/components/components.dart';
 
 class AgeSelectionPage extends StatefulWidget {
   final Function(int)? onAgeSelected;

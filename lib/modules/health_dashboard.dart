@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'dart:ui';
-import 'package:tracker/shared/components/bottom_nav_bar.dart';
+import 'package:tracker/shared/components/components.dart';
 import 'package:tracker/modules/workout_screen.dart';
 import 'package:tracker/modules/profile_page.dart';
 import 'package:tracker/modules/challenge_screen.dart';
 import 'package:tracker/modules/activity_tracker.dart';
-import 'package:tracker/shared/components/custom_app_bar.dart';
 import 'package:tracker/layout/main_app_layout.dart';
 import 'package:tracker/layout/card_section_layout.dart';
 
