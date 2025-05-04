@@ -73,29 +73,56 @@ class LoginPage extends StatelessWidget {
           ),
         ),
       ],
-      bottomButton: SizedBox(
-        width: double.infinity,
-        height: 55,
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.buttonBackground,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+      bottomButton: Column(
+        children: [
+          SizedBox(
+            width: double.infinity,
+            height: 55,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.buttonBackground,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              onPressed: () {
+                // Login logic will go here
+              },
+              child: Text(
+                'Login',
+                style: AppTextStyles.buttonLarge,
+              ),
             ),
           ),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const WorkoutMotivationScreen(),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            height: 55,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(color: AppColors.buttonBackground),
+                ),
               ),
-            );
-          },
-          child: Text(
-            'Login',
-            style: AppTextStyles.buttonLarge,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const WorkoutMotivationScreen(),
+                  ),
+                );
+              },
+              child: Text(
+                'Sign Up',
+                style: AppTextStyles.buttonLarge.copyWith(
+                  color: AppColors.buttonBackground,
+                ),
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
