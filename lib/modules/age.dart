@@ -42,7 +42,6 @@ class _AgeSelectionPageState extends State<AgeSelectionPage> {
   void _scrollToSelectedAge({bool animate = true}) {
     if (_scrollController.hasClients) {
       final itemExtent = 60.0;
-      final screenWidth = MediaQuery.of(context).size.width;
       final offset = (selectedAge - minAge) * itemExtent;
 
       if (animate) {
@@ -205,28 +204,4 @@ class _AgeSelectionPageState extends State<AgeSelectionPage> {
       ),
     );
   }
-}
-
-class TrianglePainter extends CustomPainter {
-  final Color color;
-
-  TrianglePainter({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.fill;
-
-    final path = Path()
-      ..moveTo(size.width / 2, 0)
-      ..lineTo(0, size.height)
-      ..lineTo(size.width, size.height)
-      ..close();
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
