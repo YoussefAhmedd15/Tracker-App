@@ -19,7 +19,7 @@ class _SettingsPageState extends State<SettingsPage> {
   bool notificationsEnabled = true;
   bool connectionAlertsEnabled = true;
   bool phoneCallsEnabled = false;
-  int selectedIndex = 3; // Updated to match profile tab index
+  int selectedIndex = 3;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +31,6 @@ class _SettingsPageState extends State<SettingsPage> {
       contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
       onIndexChanged: (index) {
         if (index == 0) {
-          // Home icon
           Navigator.pushReplacement(
             context,
             PageRouteBuilder(
@@ -51,7 +50,6 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           );
         } else if (index == 1) {
-          // Trophy icon (challenges)
           Navigator.pushReplacement(
             context,
             PageRouteBuilder(
@@ -71,7 +69,6 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           );
         } else if (index == 2) {
-          // Heart icon (workout)
           Navigator.pushReplacement(
             context,
             PageRouteBuilder(
@@ -91,7 +88,6 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           );
         } else if (index == 3) {
-          // Profile icon
           Navigator.pushReplacement(
             context,
             PageRouteBuilder(

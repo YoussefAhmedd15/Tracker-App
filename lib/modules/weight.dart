@@ -74,23 +74,16 @@ class _WeightSelectionPageState extends State<WeightSelectionPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
           const Text(
             "What's Your\nWeight?",
             style: AppTextStyles.heading1,
           ),
-
           const SizedBox(height: 16),
-
-          // Info text
           const InfoBox(
             text:
                 'Your weight helps us create a personalized fitness plan that is right for you',
           ),
-
           const SizedBox(height: 40),
-
-          // Selected Weight Display
           Center(
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -114,15 +107,9 @@ class _WeightSelectionPageState extends State<WeightSelectionPage> {
               ],
             ),
           ),
-
           const SizedBox(height: 10),
-
-          // Triangle indicator
           const TriangleIndicator(),
-
           const SizedBox(height: 10),
-
-          // Weight selector
           Container(
             height: 60,
             decoration: BoxDecoration(
@@ -131,7 +118,6 @@ class _WeightSelectionPageState extends State<WeightSelectionPage> {
             ),
             child: Stack(
               children: [
-                // Center Highlight
                 Center(
                   child: Container(
                     width: 60,
@@ -145,8 +131,6 @@ class _WeightSelectionPageState extends State<WeightSelectionPage> {
                     ),
                   ),
                 ),
-
-                // Scrollable Weight Numbers
                 NotificationListener<ScrollNotification>(
                   onNotification: (scrollNotification) {
                     if (scrollNotification is ScrollEndNotification) {
@@ -186,10 +170,7 @@ class _WeightSelectionPageState extends State<WeightSelectionPage> {
               ],
             ),
           ),
-
           const Spacer(),
-
-          // Continue Button
           Padding(
             padding: const EdgeInsets.only(bottom: 32.0),
             child: CustomButton(

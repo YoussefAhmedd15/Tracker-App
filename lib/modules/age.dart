@@ -72,23 +72,16 @@ class _AgeSelectionPageState extends State<AgeSelectionPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
           const Text(
             "How Old\nAre You?",
             style: AppTextStyles.heading1,
           ),
-
           const SizedBox(height: 16),
-
-          // Info text
           const InfoBox(
             text:
                 'Your age helps us create a personalized fitness plan that is right for you',
           ),
-
           const SizedBox(height: 40),
-
-          // Selected Age Display
           Center(
             child: AnimatedDefaultTextStyle(
               duration: const Duration(milliseconds: 200),
@@ -99,15 +92,9 @@ class _AgeSelectionPageState extends State<AgeSelectionPage> {
               ),
             ),
           ),
-
           const SizedBox(height: 10),
-
-          // Triangle indicator
           const TriangleIndicator(),
-
           const SizedBox(height: 10),
-
-          // Age selector
           Container(
             height: 60,
             decoration: BoxDecoration(
@@ -116,7 +103,6 @@ class _AgeSelectionPageState extends State<AgeSelectionPage> {
             ),
             child: Stack(
               children: [
-                // Center Highlight
                 Center(
                   child: Container(
                     width: 60,
@@ -130,8 +116,6 @@ class _AgeSelectionPageState extends State<AgeSelectionPage> {
                     ),
                   ),
                 ),
-
-                // Scrollable Age Numbers
                 NotificationListener<ScrollNotification>(
                   onNotification: (scrollNotification) {
                     if (scrollNotification is ScrollEndNotification) {
@@ -171,10 +155,7 @@ class _AgeSelectionPageState extends State<AgeSelectionPage> {
               ],
             ),
           ),
-
           const Spacer(),
-
-          // Continue Button
           Padding(
             padding: const EdgeInsets.only(bottom: 32.0),
             child: CustomButton(

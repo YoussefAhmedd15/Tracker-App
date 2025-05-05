@@ -80,23 +80,16 @@ class _GenderSelectionPageState extends State<GenderSelectionPage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header with enhanced design
           const Text(
             "What's Your\nGender?",
             style: AppTextStyles.heading1,
           ),
-
           const SizedBox(height: 16),
-
-          // Info text with enhanced design
           const InfoBox(
             text:
                 'Help us create a personalized experience for your fitness journey',
           ),
-
           SizedBox(height: MediaQuery.of(context).size.height * 0.08),
-
-          // Gender options in a row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -116,10 +109,7 @@ class _GenderSelectionPageState extends State<GenderSelectionPage>
               ),
             ],
           ),
-
           const Spacer(),
-
-          // Continue button with enhanced design
           Padding(
             padding: const EdgeInsets.only(bottom: 32.0),
             child: CustomButton(

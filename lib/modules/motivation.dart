@@ -14,7 +14,6 @@ class WorkoutMotivationScreen extends StatelessWidget {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Background Image
           Image.asset(
             'images/workout_man.jpg',
             fit: BoxFit.cover,
@@ -22,7 +21,6 @@ class WorkoutMotivationScreen extends StatelessWidget {
             width: double.infinity,
             height: double.infinity,
           ),
-          // Dark Gradient Overlay for better text visibility
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -35,7 +33,6 @@ class WorkoutMotivationScreen extends StatelessWidget {
               ),
             ),
           ),
-          // Back Button
           Positioned(
             top: 16,
             left: 16,
@@ -64,12 +61,10 @@ class WorkoutMotivationScreen extends StatelessWidget {
               ),
             ),
           ),
-          // Content
           SafeArea(
             child: Column(
               children: [
                 const Spacer(flex: 3),
-                // Motivation Text
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Column(
@@ -84,7 +79,6 @@ class WorkoutMotivationScreen extends StatelessWidget {
                   ),
                 ),
                 const Spacer(flex: 2),
-                // Motivational Text Box
                 Container(
                   width: double.infinity,
                   padding:
@@ -111,7 +105,6 @@ class WorkoutMotivationScreen extends StatelessWidget {
                         style: AppTextStyles.motivationalQuote,
                       ),
                       const SizedBox(height: 40),
-                      // Next Button
                       Container(
                         width: double.infinity,
                         height: 60,
