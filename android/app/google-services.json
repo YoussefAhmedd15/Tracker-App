@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "679380105565",
+    "firebase_url": "https://tracker-app-fbc43-default-rtdb.firebaseio.com",
+    "project_id": "tracker-app-fbc43",
+    "storage_bucket": "tracker-app-fbc43.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:679380105565:android:9e37323014594fcca590b4",
+        "android_client_info": {
+          "package_name": "com.example.tracker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWkUyVbiPXdCb3mTqUG2W4kth2nWTjAnU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

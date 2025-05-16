@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tracker/models/registration_data.dart';
 import 'package:tracker/modules/fill_profile_page.dart';
 import 'package:tracker/shared/styles/colors.dart';
 import 'package:tracker/shared/styles/fonts.dart';
@@ -6,11 +7,13 @@ import 'package:tracker/layout/onboarding_layout.dart';
 import 'package:tracker/shared/components/components.dart';
 
 class HeightPickerPage extends StatefulWidget {
-  final int? selectedWeight;
+  final RegistrationData? registrationData;
+  final VoidCallback? onBackPressed;
 
   const HeightPickerPage({
     super.key,
-    this.selectedWeight,
+    this.registrationData,
+    this.onBackPressed,
   });
 
   @override
@@ -21,12 +24,31 @@ class _HeightPickerPageState extends State<HeightPickerPage> {
   FixedExtentScrollController scrollController =
       FixedExtentScrollController(initialItem: 45);
   int selectedHeight = 165;
+  late RegistrationData _registrationData;
 
   double dragStartDy = 0.0;
 
   @override
+  void initState() {
+    super.initState();
+
+    // Initialize registration data
+    _registrationData = widget.registrationData ?? RegistrationData();
+
+    // Set selected height if available in registration data
+    if (_registrationData.height != null) {
+      selectedHeight = _registrationData.height!;
+      // Update scroll controller to show the correct height
+      scrollController = FixedExtentScrollController(
+        initialItem: selectedHeight - 120,
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return OnboardingLayout(
+      onBackPressed: widget.onBackPressed,
       child: Column(
         children: [
           const Text(
@@ -154,12 +176,15 @@ class _HeightPickerPageState extends State<HeightPickerPage> {
             child: CustomButton(
               text: 'Continue',
               onPressed: () {
+                // Update registration data with selected height
+                _registrationData.height = selectedHeight;
+
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => FillProfilePage(
-                      selectedWeight: widget.selectedWeight,
-                      selectedHeight: selectedHeight,
+                      registrationData: _registrationData,
+                      onBackPressed: () => Navigator.pop(context),
                     ),
                   ),
                 );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tracker/models/registration_data.dart';
 import 'package:tracker/modules/age.dart';
 import 'package:tracker/shared/styles/colors.dart';
 import 'package:tracker/shared/styles/fonts.dart';
@@ -6,12 +7,12 @@ import 'package:tracker/layout/onboarding_layout.dart';
 import 'package:tracker/shared/components/components.dart';
 
 class GenderSelectionPage extends StatefulWidget {
-  final Function(String)? onGenderSelected;
+  final RegistrationData? registrationData;
   final VoidCallback? onBackPressed;
 
   const GenderSelectionPage({
     super.key,
-    this.onGenderSelected,
+    this.registrationData,
     this.onBackPressed,
   });
 
@@ -24,6 +25,7 @@ class _GenderSelectionPageState extends State<GenderSelectionPage>
   String? selectedGender;
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
+  late RegistrationData _registrationData;
 
   @override
   void initState() {
@@ -35,6 +37,14 @@ class _GenderSelectionPageState extends State<GenderSelectionPage>
     _scaleAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
+
+    // Initialize registration data
+    _registrationData = widget.registrationData ?? RegistrationData();
+
+    // Set selected gender if available in registration data
+    if (_registrationData.gender != null) {
+      selectedGender = _registrationData.gender;
+    }
   }
 
   @override
@@ -51,16 +61,14 @@ class _GenderSelectionPageState extends State<GenderSelectionPage>
   }
 
   void _navigateToAgeSelection() {
+    // Update registration data with selected gender
+    _registrationData.gender = selectedGender;
+
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => AgeSelectionPage(
-          onAgeSelected: (age) {
-            if (widget.onGenderSelected != null) {
-              widget.onGenderSelected!(selectedGender!);
-            }
-            Navigator.pop(context, age);
-          },
+          registrationData: _registrationData,
           onBackPressed: () => Navigator.pop(context),
         ),
       ),
@@ -114,14 +122,8 @@ class _GenderSelectionPageState extends State<GenderSelectionPage>
             padding: const EdgeInsets.only(bottom: 32.0),
             child: CustomButton(
               text: 'Continue',
-              onPressed: selectedGender != null
-                  ? () {
-                      if (widget.onGenderSelected != null) {
-                        widget.onGenderSelected!(selectedGender!);
-                      }
-                      _navigateToAgeSelection();
-                    }
-                  : () {},
+              onPressed:
+                  selectedGender != null ? _navigateToAgeSelection : null,
               isEnabled: selectedGender != null,
             ),
           ),

@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:tracker/models/registration_data.dart';
 import 'package:tracker/modules/gender.dart';
 import 'package:tracker/shared/styles/colors.dart';
 import 'package:tracker/shared/styles/fonts.dart';
 import 'package:tracker/shared/components/components.dart';
 
 class WorkoutMotivationScreen extends StatelessWidget {
-  const WorkoutMotivationScreen({super.key});
+  final RegistrationData? registrationData;
+
+  const WorkoutMotivationScreen({
+    super.key,
+    this.registrationData,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -115,8 +121,9 @@ class WorkoutMotivationScreen extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const GenderSelectionPage(),
+                                builder: (context) => GenderSelectionPage(
+                                  registrationData: registrationData,
+                                ),
                               ),
                             );
                           },

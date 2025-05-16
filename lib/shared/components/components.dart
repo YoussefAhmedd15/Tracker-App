@@ -602,7 +602,7 @@ class CustomTextField extends StatelessWidget {
 
 class CustomButton extends StatelessWidget {
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final bool isEnabled;
   final double? width;
   final double? height;

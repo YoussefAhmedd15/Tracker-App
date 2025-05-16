@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'dart:ui';
+import 'package:tracker/models/realtime_user_model.dart';
 import 'package:tracker/shared/components/components.dart';
 import 'package:tracker/modules/workout_screen.dart';
 import 'package:tracker/modules/profile_page.dart';
@@ -8,9 +9,15 @@ import 'package:tracker/modules/challenge_screen.dart';
 import 'package:tracker/modules/activity_tracker.dart';
 import 'package:tracker/layout/main_app_layout.dart';
 import 'package:tracker/layout/card_section_layout.dart';
+import 'package:tracker/shared/network/realtime_database_service.dart';
 
 class HealthDashboardScreen extends StatefulWidget {
-  const HealthDashboardScreen({super.key});
+  final String? userId;
+
+  const HealthDashboardScreen({
+    super.key,
+    this.userId,
+  });
 
   @override
   State<HealthDashboardScreen> createState() => _HealthDashboardScreenState();
@@ -18,6 +25,41 @@ class HealthDashboardScreen extends StatefulWidget {
 
 class _HealthDashboardScreenState extends State<HealthDashboardScreen> {
   int selectedIndex = 0;
+  bool _isLoading = true;
+  RealtimeUserModel? _user;
+  final RealtimeDatabaseService _databaseService = RealtimeDatabaseService();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.userId != null) {
+      _loadUserData();
+    }
+  }
+
+  Future<void> _loadUserData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final user = await _databaseService.getUser(widget.userId!);
+
+      if (mounted) {
+        setState(() {
+          _user = user;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error loading user data: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,29 +67,31 @@ class _HealthDashboardScreenState extends State<HealthDashboardScreen> {
       title: 'Health Dashboard',
       time: '9:41',
       selectedIndex: selectedIndex,
-      body: Column(
-        children: [
-          _buildHeader(),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                children: [
-                  const SizedBox(height: 16),
-                  _buildProgressCard(),
-                  const SizedBox(height: 16),
-                  _buildMetricsRow(),
-                  const SizedBox(height: 16),
-                  _buildStandingCard(),
-                  const SizedBox(height: 16),
-                  _buildBottomCards(),
-                  const SizedBox(height: 16),
-                ],
-              ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
+              children: [
+                _buildHeader(),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 16),
+                        _buildProgressCard(),
+                        const SizedBox(height: 16),
+                        _buildMetricsRow(),
+                        const SizedBox(height: 16),
+                        _buildStandingCard(),
+                        const SizedBox(height: 16),
+                        _buildBottomCards(),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
       onIndexChanged: (index) {
         setState(() {
           selectedIndex = index;
@@ -67,24 +111,27 @@ class _HealthDashboardScreenState extends State<HealthDashboardScreen> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: Colors.blue.shade200,
-              image: const DecorationImage(
-                image: NetworkImage('https://picsum.photos/200'),
+              image: DecorationImage(
+                image: _user?.profileImage != null &&
+                        _user!.profileImage.isNotEmpty
+                    ? NetworkImage(_user!.profileImage)
+                    : const AssetImage('images/pp.jpg') as ImageProvider,
                 fit: BoxFit.cover,
               ),
             ),
           ),
           const SizedBox(width: 12),
-          const Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Hi, Joseph',
-                style: TextStyle(
+                'Hi, ${_user?.nickname ?? _user?.fullName?.split(' ').first ?? 'User'}',
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              Text(
+              const Text(
                 'Good Morning',
                 style: TextStyle(
                   fontSize: 14,

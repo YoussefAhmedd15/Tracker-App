@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tracker/models/registration_data.dart';
 import 'package:tracker/modules/weight.dart';
 import 'package:tracker/shared/styles/colors.dart';
 import 'package:tracker/shared/styles/fonts.dart';
@@ -6,12 +7,12 @@ import 'package:tracker/layout/onboarding_layout.dart';
 import 'package:tracker/shared/components/components.dart';
 
 class AgeSelectionPage extends StatefulWidget {
-  final Function(int)? onAgeSelected;
+  final RegistrationData? registrationData;
   final VoidCallback? onBackPressed;
 
   const AgeSelectionPage({
     super.key,
-    this.onAgeSelected,
+    this.registrationData,
     this.onBackPressed,
   });
 
@@ -24,10 +25,20 @@ class _AgeSelectionPageState extends State<AgeSelectionPage> {
   final int maxAge = 100;
   int selectedAge = 28;
   final ScrollController _scrollController = ScrollController();
+  late RegistrationData _registrationData;
 
   @override
   void initState() {
     super.initState();
+
+    // Initialize registration data
+    _registrationData = widget.registrationData ?? RegistrationData();
+
+    // Set selected age if available in registration data
+    if (_registrationData.age != null) {
+      selectedAge = _registrationData.age!;
+    }
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToSelectedAge(animate: false);
     });
@@ -63,6 +74,21 @@ class _AgeSelectionPageState extends State<AgeSelectionPage> {
       });
       _scrollToSelectedAge();
     }
+  }
+
+  void _navigateToWeightSelection() {
+    // Update registration data with selected age
+    _registrationData.age = selectedAge;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => WeightSelectionPage(
+          registrationData: _registrationData,
+          onBackPressed: () => Navigator.pop(context),
+        ),
+      ),
+    );
   }
 
   @override
@@ -160,25 +186,7 @@ class _AgeSelectionPageState extends State<AgeSelectionPage> {
             padding: const EdgeInsets.only(bottom: 32.0),
             child: CustomButton(
               text: 'Continue',
-              onPressed: () {
-                if (widget.onAgeSelected != null) {
-                  widget.onAgeSelected!(selectedAge);
-                }
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => WeightSelectionPage(
-                      onWeightSelected: (weight) {
-                        if (widget.onAgeSelected != null) {
-                          widget.onAgeSelected!(selectedAge);
-                        }
-                        Navigator.pop(context, weight);
-                      },
-                      onBackPressed: () => Navigator.pop(context),
-                    ),
-                  ),
-                );
-              },
+              onPressed: _navigateToWeightSelection,
             ),
           ),
         ],

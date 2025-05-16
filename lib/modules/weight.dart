@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tracker/models/registration_data.dart';
 import 'package:tracker/shared/styles/colors.dart';
 import 'package:tracker/shared/styles/fonts.dart';
 import 'package:tracker/modules/height_picker_page.dart';
@@ -6,11 +7,13 @@ import 'package:tracker/layout/onboarding_layout.dart';
 import 'package:tracker/shared/components/components.dart';
 
 class WeightSelectionPage extends StatefulWidget {
+  final RegistrationData? registrationData;
   final Function(int)? onWeightSelected;
   final VoidCallback? onBackPressed;
 
   const WeightSelectionPage({
     super.key,
+    this.registrationData,
     this.onWeightSelected,
     this.onBackPressed,
   });
@@ -24,10 +27,20 @@ class _WeightSelectionPageState extends State<WeightSelectionPage> {
   final int minWeight = 40;
   final int maxWeight = 150;
   final ScrollController _scrollController = ScrollController();
+  late RegistrationData _registrationData;
 
   @override
   void initState() {
     super.initState();
+
+    // Initialize registration data
+    _registrationData = widget.registrationData ?? RegistrationData();
+
+    // Set selected weight if available in registration data
+    if (_registrationData.weight != null) {
+      selectedWeight = _registrationData.weight!;
+    }
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToSelectedWeight(animate: false);
     });
@@ -65,6 +78,21 @@ class _WeightSelectionPageState extends State<WeightSelectionPage> {
       });
       _scrollToSelectedWeight();
     }
+  }
+
+  void _navigateToHeightSelection() {
+    // Update registration data with selected weight
+    _registrationData.weight = selectedWeight;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => HeightPickerPage(
+          registrationData: _registrationData,
+          onBackPressed: () => Navigator.pop(context),
+        ),
+      ),
+    );
   }
 
   @override
@@ -175,16 +203,7 @@ class _WeightSelectionPageState extends State<WeightSelectionPage> {
             padding: const EdgeInsets.only(bottom: 32.0),
             child: CustomButton(
               text: 'Continue',
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => HeightPickerPage(
-                      selectedWeight: selectedWeight,
-                    ),
-                  ),
-                );
-              },
+              onPressed: _navigateToHeightSelection,
             ),
           ),
         ],

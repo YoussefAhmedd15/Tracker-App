@@ -1,0 +1,24 @@
+{
+  "rules": {
+    ".read": "auth == null",
+    ".write": "auth == null",
+    "users": {
+      ".indexOn": ["email"]
+    },
+    "activities": {
+      ".indexOn": ["userId"]
+    },
+    "weight_records": {
+      ".indexOn": ["userId"]
+    },
+    "workouts": {
+      ".indexOn": ["userId"]
+    },
+    "goals": {
+      ".indexOn": ["userId"]
+    },
+    "challenges": {
+      ".indexOn": ["userId"]
+    }
+  }
+} 
