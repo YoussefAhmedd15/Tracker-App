@@ -147,46 +147,6 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
           ),
-          // Development only: Sample data creator button
-          if (true) // Change to a development flag in production
-            Padding(
-              padding: const EdgeInsets.only(top: 16.0),
-              child: TextButton(
-                onPressed: () async {
-                  final scaffold = ScaffoldMessenger.of(context);
-                  try {
-                    scaffold.showSnackBar(
-                      const SnackBar(
-                        content: Text('Creating sample data...'),
-                        duration: Duration(seconds: 1),
-                      ),
-                    );
-
-                    await createSampleData();
-
-                    scaffold.showSnackBar(
-                      const SnackBar(
-                        content: Text('Sample data created successfully'),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
-                  } catch (e) {
-                    scaffold.showSnackBar(
-                      SnackBar(
-                        content: Text('Error: $e'),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
-                },
-                child: Text(
-                  'Create Sample Data',
-                  style: AppTextStyles.bodySmall.copyWith(
-                    decoration: TextDecoration.underline,
-                  ),
-                ),
-              ),
-            ),
         ],
       ),
       children: [
@@ -259,18 +219,6 @@ class _LoginPageState extends State<LoginPage> {
                     },
                   ),
                 ],
-              ),
-              const SizedBox(height: 16),
-              // Forgot Password
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () {},
-                  child: Text(
-                    'Forgot Password?',
-                    style: AppTextStyles.bodySmall,
-                  ),
-                ),
               ),
             ],
           ),
