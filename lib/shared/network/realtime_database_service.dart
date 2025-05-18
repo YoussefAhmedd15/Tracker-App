@@ -495,4 +495,213 @@ class RealtimeDatabaseService {
         .equalTo(userId)
         .onValue;
   }
+
+  // Add this method to fetch available workouts
+  Future<List<RealtimeWorkoutModel>> getAvailableWorkouts() async {
+    List<RealtimeWorkoutModel> workouts = [];
+
+    try {
+      final workoutsRef = FirebaseDatabase.instance.ref().child('workouts');
+      final snapshot = await workoutsRef.get();
+
+      if (snapshot.exists) {
+        // Check if the value is a Map, not just a boolean placeholder
+        if (snapshot.value is Map) {
+          final workoutsData = snapshot.value as Map<dynamic, dynamic>;
+          workoutsData.forEach((key, value) {
+            // Ensure each entry is also a map
+            if (value is Map) {
+              workouts.add(RealtimeWorkoutModel.fromRealtime(key, value));
+            }
+          });
+        } else {
+          // If it's not a map (e.g., just a boolean), we need to initialize it properly
+          print(
+              'Workouts node exists but is not formatted correctly. Creating sample workouts.');
+          await createSampleWorkouts();
+
+          // Try to fetch again after creating samples
+          final newSnapshot = await workoutsRef.get();
+          if (newSnapshot.exists && newSnapshot.value is Map) {
+            final workoutsData = newSnapshot.value as Map<dynamic, dynamic>;
+            workoutsData.forEach((key, value) {
+              if (value is Map) {
+                workouts.add(RealtimeWorkoutModel.fromRealtime(key, value));
+              }
+            });
+          }
+        }
+      } else {
+        // Workouts node doesn't exist, create sample workouts
+        print('Workouts node does not exist. Creating sample workouts.');
+        await createSampleWorkouts();
+
+        // Try to fetch again after creating samples
+        final newSnapshot = await workoutsRef.get();
+        if (newSnapshot.exists && newSnapshot.value is Map) {
+          final workoutsData = newSnapshot.value as Map<dynamic, dynamic>;
+          workoutsData.forEach((key, value) {
+            if (value is Map) {
+              workouts.add(RealtimeWorkoutModel.fromRealtime(key, value));
+            }
+          });
+        }
+      }
+    } catch (e) {
+      print('Error getting available workouts: $e');
+    }
+
+    return workouts;
+  }
+
+  // Add method to create sample workouts
+  Future<void> createSampleWorkouts() async {
+    try {
+      final workoutsRef = FirebaseDatabase.instance.ref().child('workouts');
+
+      // First, check if we need to clear the existing node (if it's just a boolean)
+      final snapshot = await workoutsRef.get();
+      if (snapshot.exists && !(snapshot.value is Map)) {
+        // Remove the incorrectly formatted node
+        await workoutsRef.remove();
+      }
+
+      // Sample workout 1: Full Body Workout
+      final workout1 = RealtimeWorkoutModel(
+        userId: 'admin',
+        name: 'Full Body Workout',
+        type: 'Strength',
+        duration: 45,
+        caloriesBurned: 350,
+        date: DateTime.now().millisecondsSinceEpoch,
+        exercises: [
+          RealtimeExerciseModel(name: 'Push-ups', sets: 3, reps: 15),
+          RealtimeExerciseModel(name: 'Squats', sets: 3, reps: 20),
+          RealtimeExerciseModel(name: 'Pull-ups', sets: 3, reps: 8),
+          RealtimeExerciseModel(name: 'Lunges', sets: 3, reps: 10),
+          RealtimeExerciseModel(name: 'Plank', sets: 3, reps: 1),
+        ],
+        timestamp: DateTime.now().millisecondsSinceEpoch,
+      );
+
+      // Sample workout 2: Cardio Blast
+      final workout2 = RealtimeWorkoutModel(
+        userId: 'admin',
+        name: 'Cardio Blast',
+        type: 'Cardio',
+        duration: 30,
+        caloriesBurned: 400,
+        date: DateTime.now().millisecondsSinceEpoch,
+        exercises: [
+          RealtimeExerciseModel(name: 'Jumping Jacks', sets: 3, reps: 30),
+          RealtimeExerciseModel(name: 'Mountain Climbers', sets: 3, reps: 20),
+          RealtimeExerciseModel(name: 'Burpees', sets: 3, reps: 15),
+          RealtimeExerciseModel(name: 'High Knees', sets: 3, reps: 40),
+        ],
+        timestamp: DateTime.now().millisecondsSinceEpoch,
+      );
+
+      // Sample workout 3: Core Crusher
+      final workout3 = RealtimeWorkoutModel(
+        userId: 'admin',
+        name: 'Core Crusher',
+        type: 'Core',
+        duration: 20,
+        caloriesBurned: 250,
+        date: DateTime.now().millisecondsSinceEpoch,
+        exercises: [
+          RealtimeExerciseModel(name: 'Crunches', sets: 3, reps: 25),
+          RealtimeExerciseModel(name: 'Russian Twists', sets: 3, reps: 20),
+          RealtimeExerciseModel(name: 'Leg Raises', sets: 3, reps: 15),
+          RealtimeExerciseModel(name: 'Plank', sets: 3, reps: 1),
+        ],
+        timestamp: DateTime.now().millisecondsSinceEpoch,
+      );
+
+      // Save the workouts to the database
+      await workoutsRef.child('workout1').set(workout1.toMap());
+      await workoutsRef.child('workout2').set(workout2.toMap());
+      await workoutsRef.child('workout3').set(workout3.toMap());
+
+      print('Sample workouts created successfully');
+    } catch (e) {
+      print('Error creating sample workouts: $e');
+      throw e;
+    }
+  }
+
+  // Add method to get available workouts for a user (excluding completed ones)
+  Future<List<RealtimeWorkoutModel>> getAvailableWorkoutsForUser(
+      String userId) async {
+    // Get all available workouts
+    List<RealtimeWorkoutModel> allWorkouts = await getAvailableWorkouts();
+
+    // Get user's completed workouts
+    List<RealtimeWorkoutModel> completedWorkouts =
+        await getUserCompletedWorkouts(userId);
+
+    // If no completed workouts, return all available workouts
+    if (completedWorkouts.isEmpty) {
+      return allWorkouts;
+    }
+
+    // Extract completed workout names to filter available workouts
+    final completedWorkoutNames = completedWorkouts.map((w) => w.name).toSet();
+
+    // Filter out workouts that have already been completed
+    return allWorkouts
+        .where((workout) => !completedWorkoutNames.contains(workout.name))
+        .toList();
+  }
+
+  // Add method to get user's completed workouts
+  Future<List<RealtimeWorkoutModel>> getUserCompletedWorkouts(
+      String userId) async {
+    List<RealtimeWorkoutModel> completedWorkouts = [];
+
+    try {
+      final userWorkoutsRef =
+          FirebaseDatabase.instance.ref().child('user_workouts').child(userId);
+      final snapshot = await userWorkoutsRef.get();
+
+      if (snapshot.exists) {
+        final workoutsData = snapshot.value as Map<dynamic, dynamic>;
+        workoutsData.forEach((key, value) {
+          completedWorkouts.add(RealtimeWorkoutModel.fromRealtime(key, value));
+        });
+
+        // Sort by date (most recent first)
+        completedWorkouts.sort((a, b) => b.date.compareTo(a.date));
+      }
+    } catch (e) {
+      print('Error getting user completed workouts: $e');
+    }
+
+    return completedWorkouts;
+  }
+
+  // Add this method to save workout progress
+  Future<void> saveWorkoutProgress(RealtimeWorkoutModel workout) async {
+    try {
+      // Get the reference to user workouts
+      final userWorkoutsRef = FirebaseDatabase.instance
+          .ref()
+          .child('user_workouts')
+          .child(workout.userId)
+          .push();
+
+      // Generate timestamp
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+
+      // Prepare workout data with timestamp
+      final workoutData = workout.toMap();
+      workoutData['timestamp'] = timestamp;
+
+      // Save the workout
+      await userWorkoutsRef.set(workoutData);
+    } catch (e) {
+      print('Error saving workout progress: $e');
+      throw e;
+    }
+  }
 }

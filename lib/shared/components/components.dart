@@ -382,7 +382,7 @@ class WorkoutTopCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Text(
-              'AIDONG',
+              'Workouts',
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
