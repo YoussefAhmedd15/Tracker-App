@@ -2,7 +2,7 @@ import 'package:tracker/models/realtime_activity_model.dart';
 import 'package:tracker/models/realtime_user_model.dart';
 import 'package:tracker/models/realtime_weight_record_model.dart';
 import 'package:tracker/models/realtime_workout_model.dart';
-import 'package:tracker/shared/network/realtime_database_service.dart';
+import 'package:tracker/shared/network/remote/realtime_database_service.dart';
 
 class RealtimeDataCreator {
   final RealtimeDatabaseService _databaseService = RealtimeDatabaseService();

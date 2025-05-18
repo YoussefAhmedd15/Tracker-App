@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tracker/models/realtime_user_model.dart';
-import 'package:tracker/shared/network/realtime_database_service.dart';
+import 'package:tracker/shared/network/remote/realtime_database_service.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 class UserService {

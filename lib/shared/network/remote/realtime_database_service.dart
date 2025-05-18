@@ -1,8 +1,8 @@
 import 'package:firebase_database/firebase_database.dart';
-import '../../models/realtime_user_model.dart';
-import '../../models/realtime_workout_model.dart';
-import '../../models/realtime_activity_model.dart';
-import '../../models/realtime_weight_record_model.dart';
+import '../../../models/realtime_user_model.dart';
+import '../../../models/realtime_workout_model.dart';
+import '../../../models/realtime_activity_model.dart';
+import '../../../models/realtime_weight_record_model.dart';
 
 class RealtimeDatabaseService {
   final DatabaseReference _database = FirebaseDatabase.instance.ref();

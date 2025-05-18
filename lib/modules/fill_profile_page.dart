@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tracker/layout/auth_layout.dart';
 import 'package:tracker/models/registration_data.dart';
-import 'package:tracker/shared/network/user_service.dart';
+import 'package:tracker/shared/network/remote/user_service.dart';
 import 'package:tracker/shared/styles/colors.dart';
 import 'package:tracker/shared/styles/fonts.dart';
 import 'package:tracker/layout/onboarding_layout.dart';

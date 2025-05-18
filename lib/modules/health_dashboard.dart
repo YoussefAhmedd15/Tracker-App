@@ -10,7 +10,7 @@ import 'package:tracker/modules/challenge_screen.dart';
 import 'package:tracker/modules/activity_tracker.dart';
 import 'package:tracker/layout/main_app_layout.dart';
 import 'package:tracker/layout/card_section_layout.dart';
-import 'package:tracker/shared/network/realtime_database_service.dart';
+import 'package:tracker/shared/network/remote/realtime_database_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:tracker/shared/providers/step_counter_provider.dart';

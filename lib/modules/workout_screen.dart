@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tracker/shared/components/components.dart';
 import 'package:tracker/layout/main_app_layout.dart';
 import 'package:tracker/models/realtime_workout_model.dart';
-import 'package:tracker/shared/network/realtime_database_service.dart';
+import 'package:tracker/shared/network/remote/realtime_database_service.dart';
 import 'package:tracker/modules/workout_detail_screen.dart';
 import 'package:intl/intl.dart';
 

@@ -4,7 +4,7 @@ import 'package:tracker/models/realtime_activity_model.dart';
 import 'package:tracker/models/realtime_user_model.dart';
 import 'package:tracker/models/realtime_weight_record_model.dart';
 import 'package:tracker/shared/components/components.dart';
-import 'package:tracker/shared/network/realtime_database_service.dart';
+import 'package:tracker/shared/network/remote/realtime_database_service.dart';
 import 'package:tracker/shared/styles/colors.dart';
 import 'package:tracker/shared/styles/fonts.dart';
 import 'package:intl/intl.dart';

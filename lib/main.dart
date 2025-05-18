@@ -13,7 +13,7 @@ import 'package:tracker/modules/settings.dart';
 import 'package:tracker/shared/providers/language_provider.dart';
 import 'package:tracker/shared/providers/step_counter_provider.dart';
 import 'firebase_options.dart';
-import 'shared/network/realtime_database_service.dart';
+import 'shared/network/remote/realtime_database_service.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 void main() async {

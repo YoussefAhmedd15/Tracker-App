@@ -12,7 +12,7 @@ import 'package:tracker/modules/language_selection_page.dart';
 import 'package:tracker/shared/providers/language_provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:tracker/models/realtime_user_model.dart';
-import 'package:tracker/shared/network/realtime_database_service.dart';
+import 'package:tracker/shared/network/remote/realtime_database_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsPage extends StatefulWidget {
