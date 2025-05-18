@@ -45,5 +45,8 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<!-- Permission for step counting -->
+	<key>NSMotionUsageDescription</key>
+	<string>This app needs to access motion and fitness data to count steps and calculate calories burned</string>
 </dict>
 </plist>

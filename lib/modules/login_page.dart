@@ -7,6 +7,8 @@ import 'package:tracker/shared/styles/colors.dart';
 import 'package:tracker/shared/styles/fonts.dart';
 import 'package:tracker/layout/onboarding_layout.dart';
 import 'package:tracker/modules/motivation.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -50,6 +52,10 @@ class _LoginPageState extends State<LoginPage> {
           });
 
           if (user != null) {
+            // Store user ID in SharedPreferences
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setString('current_user_id', user.id);
+
             // Login successful, navigate to health dashboard
             Navigator.pushReplacement(
               context,
@@ -77,8 +83,10 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return AuthLayout(
-      title: 'Login',
+      title: l10n.login,
       subtitle: 'Welcome back! Please enter your details.',
       bottomButton: Column(
         children: [
@@ -114,7 +122,7 @@ class _LoginPageState extends State<LoginPage> {
                       color: Colors.white,
                     )
                   : Text(
-                      'Login',
+                      l10n.login,
                       style: AppTextStyles.buttonLarge,
                     ),
             ),
@@ -140,7 +148,7 @@ class _LoginPageState extends State<LoginPage> {
                 );
               },
               child: Text(
-                'Sign Up',
+                l10n.signup,
                 style: AppTextStyles.buttonLarge.copyWith(
                   color: AppColors.buttonBackground,
                 ),
@@ -159,7 +167,7 @@ class _LoginPageState extends State<LoginPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Email',
+                    l10n.email,
                     style: AppTextStyles.inputLabel,
                   ),
                   const SizedBox(height: 8),
@@ -195,7 +203,7 @@ class _LoginPageState extends State<LoginPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Password',
+                    l10n.password,
                     style: AppTextStyles.inputLabel,
                   ),
                   const SizedBox(height: 8),

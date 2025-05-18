@@ -14,6 +14,13 @@ class MainAppLayout extends StatelessWidget {
   final Function(int)? onIndexChanged;
   final EdgeInsetsGeometry contentPadding;
   final bool navigateOnTabChange;
+  // Add a static map to store screen instances
+  static final Map<int, Widget> _screenInstances = {
+    0: const HealthDashboardScreen(),
+    1: const ChallengeScreen(),
+    2: const WorkoutScreen(),
+    3: const ProfilePage(),
+  };
 
   const MainAppLayout({
     Key? key,
@@ -58,23 +65,8 @@ class MainAppLayout extends StatelessWidget {
   }
 
   void _navigateToScreen(BuildContext context, int index) {
-    Widget screen;
-    switch (index) {
-      case 0:
-        screen = const HealthDashboardScreen();
-        break;
-      case 1:
-        screen = const ChallengeScreen();
-        break;
-      case 2:
-        screen = const WorkoutScreen();
-        break;
-      case 3:
-        screen = const ProfilePage();
-        break;
-      default:
-        screen = const HealthDashboardScreen();
-    }
+    // Get the cached screen instance or create a new one
+    Widget screen = _screenInstances[index] ?? const HealthDashboardScreen();
 
     Navigator.pushReplacement(
       context,

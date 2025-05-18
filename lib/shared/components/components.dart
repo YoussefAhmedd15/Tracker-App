@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'package:tracker/shared/styles/colors.dart';
 import 'package:tracker/shared/styles/fonts.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 // BOTTOM NAV BAR
 class CustomBottomNavBar extends StatelessWidget {
@@ -16,6 +17,8 @@ class CustomBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -34,10 +37,10 @@ class CustomBottomNavBar extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildNavItem(Icons.home_rounded, 0),
-              _buildNavItem(Icons.emoji_events_rounded, 1),
-              _buildNavItem(Icons.favorite_rounded, 2),
-              _buildNavItem(Icons.person_rounded, 3),
+              _buildNavItem(Icons.home_rounded, 0, l10n.home),
+              _buildNavItem(Icons.emoji_events_rounded, 1, l10n.challenges),
+              _buildNavItem(Icons.favorite_rounded, 2, l10n.workouts),
+              _buildNavItem(Icons.person_rounded, 3, l10n.profile),
             ],
           ),
         ),
@@ -45,7 +48,7 @@ class CustomBottomNavBar extends StatelessWidget {
     );
   }
 
-  Widget _buildNavItem(IconData icon, int index) {
+  Widget _buildNavItem(IconData icon, int index, String label) {
     final bool isSelected = selectedIndex == index;
 
     return TweenAnimationBuilder<double>(
@@ -104,6 +107,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -234,20 +239,22 @@ class MuscleSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Muscles workload',
-          style: TextStyle(
+        Text(
+          l10n.musclesWorkload,
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
         const SizedBox(height: 8),
-        const Text(
-          'Select muscles type you want to make strong',
-          style: TextStyle(
+        Text(
+          l10n.selectMuscles,
+          style: const TextStyle(
             fontSize: 16,
             color: Colors.black54,
           ),
@@ -265,10 +272,10 @@ class MuscleSection extends StatelessWidget {
           itemCount: 4,
           itemBuilder: (context, index) {
             final items = [
-              {'name': 'Quads', 'color': const Color(0xFFF6F6F6)},
-              {'name': 'Chest', 'color': const Color(0xFFE5F3EA)},
-              {'name': 'Abs', 'color': const Color(0xFFFFF3E9)},
-              {'name': 'Biceps', 'color': const Color(0xFFFFEEF0)},
+              {'name': l10n.quads, 'color': const Color(0xFFF6F6F6)},
+              {'name': l10n.chest, 'color': const Color(0xFFE5F3EA)},
+              {'name': l10n.abs, 'color': const Color(0xFFFFF3E9)},
+              {'name': l10n.biceps, 'color': const Color(0xFFFFEEF0)},
             ];
             return ExerciseCard(
               name: items[index]['name'] as String,
@@ -294,6 +301,8 @@ class ProgressCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -313,16 +322,16 @@ class ProgressCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Workout Progress',
-                  style: TextStyle(
+                Text(
+                  l10n.workoutProgress,
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '$exercisesLeft Exercises left',
+                  l10n.exercisesLeft(exercisesLeft),
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.grey.shade600,
@@ -354,6 +363,8 @@ class WorkoutTopCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -380,18 +391,18 @@ class WorkoutTopCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 15),
-          const Text(
-            'Immersive sensory training',
-            style: TextStyle(
+          Text(
+            l10n.appTitle,
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Colors.black,
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Let your passion move you',
-            style: TextStyle(
+          Text(
+            l10n.workouts,
+            style: const TextStyle(
               fontSize: 16,
               color: Colors.black54,
             ),
@@ -501,9 +512,12 @@ class MetricCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 4),
-              Text(
-                unit,
-                style: const TextStyle(fontSize: 14, color: Colors.grey),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 2),
+                child: Text(
+                  unit,
+                  style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+                ),
               ),
             ],
           ),

@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:ui';
+import 'package:provider/provider.dart';
 import 'package:tracker/shared/components/components.dart';
 import 'package:tracker/modules/health_dashboard.dart';
 import 'package:tracker/modules/profile_page.dart';
 import 'package:tracker/modules/workout_screen.dart';
 import 'package:tracker/modules/challenge_screen.dart';
 import 'package:tracker/layout/main_app_layout.dart';
+import 'package:tracker/modules/language_selection_page.dart';
+import 'package:tracker/shared/providers/language_provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:tracker/models/realtime_user_model.dart';
+import 'package:tracker/shared/network/realtime_database_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -20,97 +27,64 @@ class _SettingsPageState extends State<SettingsPage> {
   bool connectionAlertsEnabled = true;
   bool phoneCallsEnabled = false;
   int selectedIndex = 3;
+  bool _isLoading = true;
+  RealtimeUserModel? _user;
+  final RealtimeDatabaseService _databaseService = RealtimeDatabaseService();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // Get the user ID from SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('current_user_id');
+
+      if (userId != null) {
+        final user = await _databaseService.getUser(userId);
+
+        if (mounted) {
+          setState(() {
+            _user = user;
+            _isLoading = false;
+          });
+        }
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error loading user data: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return MainAppLayout(
-      title: 'Settings',
+      title: l10n.settings,
       time: '9:41',
       selectedIndex: selectedIndex,
       showBackButton: true,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
       onIndexChanged: (index) {
-        if (index == 0) {
-          Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (context, animation, secondaryAnimation) =>
-                  const HealthDashboardScreen(),
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                const begin = Offset(-1.0, 0.0);
-                const end = Offset.zero;
-                const curve = Curves.easeInOut;
-                var tween = Tween(begin: begin, end: end)
-                    .chain(CurveTween(curve: curve));
-                var offsetAnimation = animation.drive(tween);
-                return SlideTransition(position: offsetAnimation, child: child);
-              },
-              transitionDuration: const Duration(milliseconds: 300),
-            ),
-          );
-        } else if (index == 1) {
-          Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (context, animation, secondaryAnimation) =>
-                  const ChallengeScreen(),
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                const begin = Offset(1.0, 0.0);
-                const end = Offset.zero;
-                const curve = Curves.easeInOut;
-                var tween = Tween(begin: begin, end: end)
-                    .chain(CurveTween(curve: curve));
-                var offsetAnimation = animation.drive(tween);
-                return SlideTransition(position: offsetAnimation, child: child);
-              },
-              transitionDuration: const Duration(milliseconds: 300),
-            ),
-          );
-        } else if (index == 2) {
-          Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (context, animation, secondaryAnimation) =>
-                  const WorkoutScreen(),
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                const begin = Offset(1.0, 0.0);
-                const end = Offset.zero;
-                const curve = Curves.easeInOut;
-                var tween = Tween(begin: begin, end: end)
-                    .chain(CurveTween(curve: curve));
-                var offsetAnimation = animation.drive(tween);
-                return SlideTransition(position: offsetAnimation, child: child);
-              },
-              transitionDuration: const Duration(milliseconds: 300),
-            ),
-          );
-        } else if (index == 3) {
-          Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (context, animation, secondaryAnimation) =>
-                  const ProfilePage(),
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                const begin = Offset(-1.0, 0.0);
-                const end = Offset.zero;
-                const curve = Curves.easeInOut;
-                var tween = Tween(begin: begin, end: end)
-                    .chain(CurveTween(curve: curve));
-                var offsetAnimation = animation.drive(tween);
-                return SlideTransition(position: offsetAnimation, child: child);
-              },
-              transitionDuration: const Duration(milliseconds: 300),
-            ),
-          );
-        } else {
-          setState(() {
-            selectedIndex = index;
-          });
-        }
+        setState(() {
+          selectedIndex = index;
+        });
       },
       body: Column(
         children: [
@@ -130,7 +104,74 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  Widget _buildUserHeader() {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    final l10n = AppLocalizations.of(context)!;
+    final userName =
+        _user?.nickname ?? _user?.fullName?.split(' ').first ?? 'User';
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.blue.shade200,
+              image: DecorationImage(
+                image: _user?.profileImage != null &&
+                        _user!.profileImage.isNotEmpty
+                    ? NetworkImage(_user!.profileImage)
+                    : const AssetImage('images/pp.jpg') as ImageProvider,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.hello,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey.shade600,
+                ),
+              ),
+              Text(
+                userName,
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildSettingsCard() {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -150,16 +191,23 @@ class _SettingsPageState extends State<SettingsPage> {
             icon: Icons.language,
             iconColor: Colors.blue,
             iconBgColor: Colors.blue.shade50,
-            title: 'Language',
-            subtitle: 'English',
-            onTap: () {},
+            title: l10n.language,
+            subtitle: languageProvider.getCurrentLanguageName(),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const LanguageSelectionPage(),
+                ),
+              );
+            },
           ),
           const Divider(height: 32),
           _buildToggleItem(
             icon: Icons.notifications,
             iconColor: Colors.orange,
             iconBgColor: Colors.orange.shade50,
-            title: 'Notifications',
+            title: l10n.notifications,
             value: notificationsEnabled,
             onChanged: (value) {
               setState(() {
@@ -172,7 +220,7 @@ class _SettingsPageState extends State<SettingsPage> {
             icon: Icons.warning,
             iconColor: Colors.red,
             iconBgColor: Colors.red.shade50,
-            title: 'Connection alerts',
+            title: l10n.connectionAlerts,
             value: connectionAlertsEnabled,
             onChanged: (value) {
               setState(() {
@@ -185,7 +233,7 @@ class _SettingsPageState extends State<SettingsPage> {
             icon: Icons.phone,
             iconColor: Colors.teal,
             iconBgColor: Colors.teal.shade50,
-            title: 'Phone calls',
+            title: l10n.phoneCalls,
             value: phoneCallsEnabled,
             onChanged: (value) {
               setState(() {

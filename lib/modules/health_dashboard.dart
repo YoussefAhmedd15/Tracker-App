@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'dart:ui';
+import 'package:provider/provider.dart';
 import 'package:tracker/models/realtime_user_model.dart';
 import 'package:tracker/shared/components/components.dart';
 import 'package:tracker/modules/workout_screen.dart';
@@ -10,6 +11,9 @@ import 'package:tracker/modules/activity_tracker.dart';
 import 'package:tracker/layout/main_app_layout.dart';
 import 'package:tracker/layout/card_section_layout.dart';
 import 'package:tracker/shared/network/realtime_database_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:tracker/shared/providers/step_counter_provider.dart';
 
 class HealthDashboardScreen extends StatefulWidget {
   final String? userId;
@@ -27,23 +31,50 @@ class _HealthDashboardScreenState extends State<HealthDashboardScreen> {
   int selectedIndex = 0;
   bool _isLoading = true;
   RealtimeUserModel? _user;
+  String? _currentUserId;
   final RealtimeDatabaseService _databaseService = RealtimeDatabaseService();
 
   @override
   void initState() {
     super.initState();
+    _loadUserData();
+
+    // Initialize step counter
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<StepCounterProvider>(context, listen: false).init();
+    });
+  }
+
+  Future<String?> _getCurrentUserId() async {
     if (widget.userId != null) {
-      _loadUserData();
+      return widget.userId;
     }
+
+    // Try to get the user ID from SharedPreferences
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('current_user_id');
   }
 
   Future<void> _loadUserData() async {
-    setState(() {
-      _isLoading = true;
-    });
+    // Don't set loading to true if we already have user data
+    if (_user == null) {
+      setState(() {
+        _isLoading = true;
+      });
+    }
 
     try {
-      final user = await _databaseService.getUser(widget.userId!);
+      _currentUserId = await _getCurrentUserId();
+
+      if (_currentUserId == null) {
+        // Handle case where no user ID is available
+        setState(() {
+          _isLoading = false;
+        });
+        return;
+      }
+
+      final user = await _databaseService.getUser(_currentUserId!);
 
       if (mounted) {
         setState(() {
@@ -63,8 +94,18 @@ class _HealthDashboardScreenState extends State<HealthDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final stepProvider = Provider.of<StepCounterProvider>(context);
+
+    // Check if we need to request permissions
+    if (!stepProvider.isLoading && !stepProvider.isPermissionGranted) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showPermissionDialog();
+      });
+    }
+
     return MainAppLayout(
-      title: 'Health Dashboard',
+      title: l10n.dashboard,
       time: '9:41',
       selectedIndex: selectedIndex,
       body: _isLoading
@@ -101,6 +142,7 @@ class _HealthDashboardScreenState extends State<HealthDashboardScreen> {
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(
@@ -181,8 +223,9 @@ class _HealthDashboardScreenState extends State<HealthDashboardScreen> {
   }
 
   Widget _buildProgressCard() {
+    final l10n = AppLocalizations.of(context)!;
     return CardSectionLayout(
-      title: 'Progress',
+      title: l10n.workoutProgress,
       actionButton: GestureDetector(
         onTap: () {
           Navigator.push(
@@ -280,6 +323,9 @@ class _HealthDashboardScreenState extends State<HealthDashboardScreen> {
   }
 
   Widget _buildMetricsRow() {
+    final l10n = AppLocalizations.of(context)!;
+    final stepProvider = Provider.of<StepCounterProvider>(context);
+
     return Row(
       children: [
         Expanded(
@@ -287,8 +333,10 @@ class _HealthDashboardScreenState extends State<HealthDashboardScreen> {
             icon: Icons.local_fire_department,
             iconColor: Colors.orange,
             iconBgColor: Colors.orange.shade50,
-            title: 'Calories',
-            value: '+400Kcal',
+            title: l10n.calories,
+            value: stepProvider.isInitialized
+                ? '+${stepProvider.calories}${l10n.kcal}'
+                : '+0${l10n.kcal}',
           ),
         ),
         const SizedBox(width: 12),
@@ -297,8 +345,10 @@ class _HealthDashboardScreenState extends State<HealthDashboardScreen> {
             icon: Icons.directions_walk,
             iconColor: Colors.purple,
             iconBgColor: Colors.purple.shade50,
-            title: 'Steps',
-            value: '+6000 steps',
+            title: l10n.steps,
+            value: stepProvider.isInitialized
+                ? '+${stepProvider.steps} ${l10n.steps.toLowerCase()}'
+                : '+0 ${l10n.steps.toLowerCase()}',
           ),
         ),
         const SizedBox(width: 12),
@@ -307,8 +357,8 @@ class _HealthDashboardScreenState extends State<HealthDashboardScreen> {
             icon: Icons.timer,
             iconColor: Colors.pink,
             iconBgColor: Colors.pink.shade50,
-            title: 'Moving',
-            value: '+40mins',
+            title: l10n.activities,
+            value: '+40${l10n.minutes}',
           ),
         ),
       ],
@@ -362,6 +412,7 @@ class _HealthDashboardScreenState extends State<HealthDashboardScreen> {
   }
 
   Widget _buildStandingCard() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -392,15 +443,15 @@ class _HealthDashboardScreenState extends State<HealthDashboardScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Standing',
-                style: TextStyle(
+              Text(
+                l10n.standing,
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               Text(
-                '0Hours',
+                '0${l10n.hours}',
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.grey.shade600,
@@ -419,6 +470,7 @@ class _HealthDashboardScreenState extends State<HealthDashboardScreen> {
   }
 
   Widget _buildBottomCards() {
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       children: [
         Expanded(
@@ -453,15 +505,15 @@ class _HealthDashboardScreenState extends State<HealthDashboardScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Sleep',
-                      style: TextStyle(
+                    Text(
+                      l10n.sleep,
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
-                      'Add sleep data',
+                      'Add ${l10n.sleep.toLowerCase()} data',
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey.shade600,
@@ -506,15 +558,15 @@ class _HealthDashboardScreenState extends State<HealthDashboardScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Heart rate',
-                      style: TextStyle(
+                    Text(
+                      l10n.heartRate,
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
-                      'Add heart data',
+                      'Add ${l10n.heartRate.toLowerCase()} data',
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey.shade600,
@@ -527,6 +579,38 @@ class _HealthDashboardScreenState extends State<HealthDashboardScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  // Show permission request dialog
+  void _showPermissionDialog() {
+    final l10n = AppLocalizations.of(context)!;
+    final stepProvider =
+        Provider.of<StepCounterProvider>(context, listen: false);
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text('Permission Required'),
+        content: Text(
+            'This app needs activity recognition permission to count your steps and calculate calories burned.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              await stepProvider.requestPermissions();
+            },
+            child: Text('Grant Permission'),
+          ),
+        ],
+      ),
     );
   }
 }
