@@ -224,6 +224,19 @@ class _HealthDashboardScreenState extends State<HealthDashboardScreen> {
 
   Widget _buildProgressCard() {
     final l10n = AppLocalizations.of(context)!;
+    final stepProvider = Provider.of<StepCounterProvider>(context);
+
+    // Get current step data
+    final steps = stepProvider.isInitialized ? stepProvider.steps : 0;
+    final calories = stepProvider.isInitialized ? stepProvider.calories : 0;
+    final minutes = stepProvider.isInitialized
+        ? (steps / 100).round()
+        : 0; // Estimate minutes based on steps
+
+    final stepProgress = math.min((steps / 10000) * 100, 100) / 100;
+    final calorieProgress = math.min((calories / 500) * 100, 100) / 100;
+    final minuteProgress = math.min((minutes / 60) * 100, 100) / 100;
+
     return CardSectionLayout(
       title: l10n.workoutProgress,
       actionButton: GestureDetector(
@@ -260,65 +273,120 @@ class _HealthDashboardScreenState extends State<HealthDashboardScreen> {
           ),
         ),
       ),
-      content: SizedBox(
-        height: 200,
-        width: 200,
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            CustomPaint(
-              size: const Size(200, 200),
-              painter: ProgressRingsPainter(),
+      content: Column(
+        children: [
+          SizedBox(
+            height: 200,
+            width: double.infinity,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                CustomPaint(
+                  size: const Size(200, 200),
+                  painter: ProgressRingsPainter(
+                    stepProgress: stepProgress,
+                    calorieProgress: calorieProgress,
+                    minuteProgress: minuteProgress,
+                  ),
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '${(((stepProgress + calorieProgress + minuteProgress) / 3) * 100).round()}%',
+                      style: const TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      l10n.completed,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-            Positioned(
-              top: 60,
-              left: 70,
-              child: Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: Colors.orange.shade100,
-                  shape: BoxShape.circle,
-                ),
-                child: const Text(
-                  '🏆',
-                  style: TextStyle(fontSize: 16),
-                ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildProgressLegend(
+                icon: Icons.directions_walk,
+                color: Colors.blue,
+                label: l10n.steps,
+                value: '$steps',
+                target: '10,000',
               ),
-            ),
-            Positioned(
-              bottom: 70,
-              left: 60,
-              child: Container(
-                padding: const EdgeInsets.all(6),
-                decoration: const BoxDecoration(
-                  color: Colors.yellow,
-                  shape: BoxShape.circle,
-                ),
-                child: const Text(
-                  '💰',
-                  style: TextStyle(fontSize: 16),
-                ),
+              _buildProgressLegend(
+                icon: Icons.local_fire_department,
+                color: Colors.orange,
+                label: l10n.calories,
+                value: '$calories',
+                target: '500 ${l10n.kcal}',
               ),
-            ),
-            Positioned(
-              bottom: 50,
-              right: 60,
-              child: Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: Colors.teal.shade200,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.circle,
-                  size: 16,
-                  color: Colors.black,
-                ),
+              _buildProgressLegend(
+                icon: Icons.timer,
+                color: Colors.green,
+                label: l10n.minutes,
+                value: '$minutes',
+                target: '60 ${l10n.minutes}',
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildProgressLegend({
+    required IconData icon,
+    required Color color,
+    required String label,
+    required String value,
+    required String target,
+  }) {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            icon,
+            color: color,
+            size: 20,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text(
+          'of $target',
+          style: TextStyle(
+            fontSize: 10,
+            color: Colors.grey.shade600,
+          ),
+        ),
+      ],
     );
   }
 
@@ -616,12 +684,22 @@ class _HealthDashboardScreenState extends State<HealthDashboardScreen> {
 }
 
 class ProgressRingsPainter extends CustomPainter {
+  final double stepProgress;
+  final double calorieProgress;
+  final double minuteProgress;
+
+  ProgressRingsPainter({
+    this.stepProgress = 0.75,
+    this.calorieProgress = 0.85,
+    this.minuteProgress = 0.95,
+  });
+
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = size.width / 2;
 
-    // Draw outer ring (blue)
+    // Draw outer ring background (steps)
     _drawRing(
       canvas: canvas,
       center: center,
@@ -629,29 +707,62 @@ class ProgressRingsPainter extends CustomPainter {
       strokeWidth: 20,
       color: Colors.blue.shade100,
       startAngle: -math.pi / 2,
-      sweepAngle: math.pi * 1.5,
+      sweepAngle: math.pi * 2,
     );
 
-    // Draw middle ring (green)
+    // Draw outer ring progress (steps)
+    _drawRing(
+      canvas: canvas,
+      center: center,
+      radius: radius,
+      strokeWidth: 20,
+      color: Colors.blue,
+      startAngle: -math.pi / 2,
+      sweepAngle: math.pi * 2 * stepProgress,
+    );
+
+    // Draw middle ring background (calories)
     _drawRing(
       canvas: canvas,
       center: center,
       radius: radius - 30,
       strokeWidth: 20,
-      color: Colors.green.shade100,
+      color: Colors.orange.shade100,
       startAngle: -math.pi / 2,
-      sweepAngle: math.pi * 1.7,
+      sweepAngle: math.pi * 2,
     );
 
-    // Draw inner ring (yellow)
+    // Draw middle ring progress (calories)
+    _drawRing(
+      canvas: canvas,
+      center: center,
+      radius: radius - 30,
+      strokeWidth: 20,
+      color: Colors.orange,
+      startAngle: -math.pi / 2,
+      sweepAngle: math.pi * 2 * calorieProgress,
+    );
+
+    // Draw inner ring background (minutes)
     _drawRing(
       canvas: canvas,
       center: center,
       radius: radius - 60,
       strokeWidth: 20,
-      color: Colors.yellow.shade100,
+      color: Colors.green.shade100,
       startAngle: -math.pi / 2,
-      sweepAngle: math.pi * 1.9,
+      sweepAngle: math.pi * 2,
+    );
+
+    // Draw inner ring progress (minutes)
+    _drawRing(
+      canvas: canvas,
+      center: center,
+      radius: radius - 60,
+      strokeWidth: 20,
+      color: Colors.green,
+      startAngle: -math.pi / 2,
+      sweepAngle: math.pi * 2 * minuteProgress,
     );
   }
 
@@ -680,7 +791,9 @@ class ProgressRingsPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return false;
+  bool shouldRepaint(covariant ProgressRingsPainter oldDelegate) {
+    return stepProgress != oldDelegate.stepProgress ||
+        calorieProgress != oldDelegate.calorieProgress ||
+        minuteProgress != oldDelegate.minuteProgress;
   }
 }
