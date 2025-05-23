@@ -14,6 +14,8 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:tracker/models/realtime_user_model.dart';
 import 'package:tracker/shared/network/remote/realtime_database_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tracker/modules/admin_page.dart';
+import 'package:tracker/shared/styles/fonts.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -30,11 +32,17 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _isLoading = true;
   RealtimeUserModel? _user;
   final RealtimeDatabaseService _databaseService = RealtimeDatabaseService();
+  bool _isAdmin = false;
 
   @override
   void initState() {
     super.initState();
+    _loadSettings();
     _loadUserData();
+  }
+
+  Future<void> _loadSettings() async {
+    // Implementation of _loadSettings method
   }
 
   Future<void> _loadUserData() async {
@@ -54,6 +62,7 @@ class _SettingsPageState extends State<SettingsPage> {
           setState(() {
             _user = user;
             _isLoading = false;
+            _isAdmin = prefs.getBool('is_admin') ?? false;
           });
         }
       } else {
@@ -93,8 +102,32 @@ class _SettingsPageState extends State<SettingsPage> {
               child: Column(
                 children: [
                   const SizedBox(height: 16),
+                  _buildUserHeader(),
+                  const SizedBox(height: 16),
                   _buildSettingsCard(),
                   const SizedBox(height: 16),
+                  if (_isAdmin) ...[
+                    const SizedBox(height: 24),
+                    Text(
+                      'Admin',
+                      style: AppTextStyles.heading3,
+                    ),
+                    const SizedBox(height: 16),
+                    ListTile(
+                      leading: const Icon(Icons.admin_panel_settings),
+                      title: const Text('Admin Dashboard'),
+                      subtitle: const Text('Manage users and app data'),
+                      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const AdminPage(),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -128,18 +161,15 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
       child: Row(
         children: [
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.blue.shade200,
-              image: DecorationImage(
-                image: _user?.profileImage != null &&
-                        _user!.profileImage.isNotEmpty
-                    ? NetworkImage(_user!.profileImage)
-                    : const AssetImage('images/pp.jpg') as ImageProvider,
-                fit: BoxFit.cover,
+          CircleAvatar(
+            radius: 30,
+            backgroundColor: Colors.blue.shade200,
+            child: Text(
+              userName.isNotEmpty ? userName[0].toUpperCase() : 'U',
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
               ),
             ),
           ),

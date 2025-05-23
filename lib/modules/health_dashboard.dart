@@ -147,18 +147,17 @@ class _HealthDashboardScreenState extends State<HealthDashboardScreen> {
       padding: const EdgeInsets.all(16.0),
       child: Row(
         children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.blue.shade200,
-              image: DecorationImage(
-                image: _user?.profileImage != null &&
-                        _user!.profileImage.isNotEmpty
-                    ? NetworkImage(_user!.profileImage)
-                    : const AssetImage('images/pp.jpg') as ImageProvider,
-                fit: BoxFit.cover,
+          CircleAvatar(
+            radius: 24,
+            backgroundColor: Colors.blue.shade200,
+            child: Text(
+              _user?.nickname?.isNotEmpty == true && _user!.nickname.isNotEmpty
+                  ? _user!.nickname[0].toUpperCase()
+                  : 'U',
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
               ),
             ),
           ),

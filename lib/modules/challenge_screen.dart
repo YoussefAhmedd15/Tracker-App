@@ -5,6 +5,9 @@ import 'package:tracker/modules/profile_page.dart';
 import 'package:tracker/modules/workout_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:tracker/layout/main_app_layout.dart';
+import 'package:tracker/models/realtime_challenge_model.dart';
+import 'package:tracker/shared/network/remote/realtime_database_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ChallengeScreen extends StatefulWidget {
   const ChallengeScreen({Key? key}) : super(key: key);
@@ -15,6 +18,97 @@ class ChallengeScreen extends StatefulWidget {
 
 class _ChallengeScreenState extends State<ChallengeScreen> {
   int selectedIndex = 1; // Challenge icon selected
+  final RealtimeDatabaseService _databaseService = RealtimeDatabaseService();
+  List<RealtimeChallengeModel> _challenges = [];
+  Map<String, dynamic> _userChallenges = {};
+  bool _isLoading = true;
+  String? _userId;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // Get user ID
+      final prefs = await SharedPreferences.getInstance();
+      _userId = prefs.getString('current_user_id');
+
+      if (_userId != null) {
+        // Load challenges and user's progress
+        final challenges = await _databaseService.getAllChallenges();
+        final userChallenges = await _databaseService.getUserChallenges(_userId!);
+
+        if (mounted) {
+          setState(() {
+            _challenges = challenges.where((c) => c.isActive).toList();
+            _userChallenges = userChallenges;
+            _isLoading = false;
+          });
+        }
+      }
+    } catch (e) {
+      print('Error loading challenges: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  RealtimeChallengeModel? _getActiveChallenge() {
+    if (_userChallenges.isEmpty) return null;
+
+    // Find the most recently joined active challenge
+    String? mostRecentChallengeId;
+    int? mostRecentTimestamp;
+
+    _userChallenges.forEach((challengeId, data) {
+      if (data['status'] == 'active') {
+        final joinedAt = data['joinedAt'] as int;
+        if (mostRecentTimestamp == null || joinedAt > mostRecentTimestamp!) {
+          mostRecentTimestamp = joinedAt;
+          mostRecentChallengeId = challengeId;
+        }
+      }
+    });
+
+    if (mostRecentChallengeId != null) {
+      return _challenges.firstWhere(
+        (c) => c.id == mostRecentChallengeId,
+        orElse: () => _challenges.first,
+      );
+    }
+
+    return null;
+  }
+
+  Future<void> _joinChallenge(String challengeId) async {
+    if (_userId == null) return;
+
+    try {
+      await _databaseService.joinChallenge(_userId!, challengeId);
+      _loadData(); // Refresh the data
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Successfully joined the challenge!')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error joining challenge: $e')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,30 +123,58 @@ class _ChallengeScreenState extends State<ChallengeScreen> {
           selectedIndex = index;
         });
       },
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 20),
-            _buildActiveChallenge(l10n),
-            const SizedBox(height: 30),
-            Text(
-              l10n.availableChallenges,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : RefreshIndicator(
+              onRefresh: _loadData,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 20),
+                    _buildActiveChallenge(l10n),
+                    const SizedBox(height: 30),
+                    Text(
+                      l10n.availableChallenges,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    _buildChallengeList(l10n),
+                  ],
+                ),
               ),
             ),
-            const SizedBox(height: 20),
-            _buildChallengeList(l10n),
-          ],
-        ),
-      ),
     );
   }
 
   Widget _buildActiveChallenge(AppLocalizations l10n) {
+    final activeChallenge = _getActiveChallenge();
+    if (activeChallenge == null) {
+      return Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF6F6F6),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Center(
+          child: Text(
+            'No active challenges. Join one below!',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey.shade600,
+            ),
+          ),
+        ),
+      );
+    }
+
+    final challengeProgress = _userChallenges[activeChallenge.id]?['progress'] ?? 0;
+    final progress = challengeProgress / activeChallenge.goal;
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -67,37 +189,37 @@ class _ChallengeScreenState extends State<ChallengeScreen> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.orange.shade100,
+                  color: activeChallenge.getColor().withOpacity(0.2),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
-                  Icons.directions_run,
-                  color: Colors.orange,
+                child: Icon(
+                  activeChallenge.getIcon(),
+                  color: activeChallenge.getColor(),
                 ),
               ),
               const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    l10n.running + ' ' + l10n.challenges.toLowerCase(),
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      activeChallenge.name,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  Text(
-                    '5 days left',
-                    style: const TextStyle(
-                      color: Colors.grey,
+                    Text(
+                      '${activeChallenge.duration} days left',
+                      style: const TextStyle(
+                        color: Colors.grey,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-              const Spacer(),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: Colors.green.shade100,
                   borderRadius: BorderRadius.circular(20),
@@ -116,10 +238,10 @@ class _ChallengeScreenState extends State<ChallengeScreen> {
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: LinearProgressIndicator(
-              value: 0.65,
+              value: progress,
               minHeight: 10,
               backgroundColor: Colors.grey.shade200,
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.orange.shade400),
+              valueColor: AlwaysStoppedAnimation<Color>(activeChallenge.getColor()),
             ),
           ),
           const SizedBox(height: 16),
@@ -127,13 +249,13 @@ class _ChallengeScreenState extends State<ChallengeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '65% ' + l10n.completed.toLowerCase(),
+                '${(progress * 100).toInt()}% ${l10n.completed.toLowerCase()}',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                 ),
               ),
               Text(
-                '13/20 ' + l10n.km,
+                '$challengeProgress/${activeChallenge.goal} ${activeChallenge.goalUnit}',
                 style: TextStyle(
                   color: Colors.grey.shade600,
                 ),
@@ -146,55 +268,27 @@ class _ChallengeScreenState extends State<ChallengeScreen> {
   }
 
   Widget _buildChallengeList(AppLocalizations l10n) {
-    final challenges = [
-      {
-        'title': '30 ' + l10n.days + ' ' + l10n.workouts,
-        'subtitle': l10n.completed + ' ' + l10n.dailyGoal.toLowerCase(),
-        'icon': Icons.fitness_center,
-        'color': Colors.blue.shade100,
-        'iconColor': Colors.blue,
-      },
-      {
-        'title': l10n.water + ' ' + l10n.challenges.toLowerCase(),
-        'subtitle': 'Drink 2L ' +
-            l10n.water.toLowerCase() +
-            ' ' +
-            l10n.dailyGoal.toLowerCase(),
-        'icon': Icons.water_drop,
-        'color': Colors.cyan.shade100,
-        'iconColor': Colors.cyan,
-      },
-      {
-        'title': l10n.yoga,
-        'subtitle': l10n.yoga +
-            ' 10 ' +
-            l10n.minutes +
-            ' ' +
-            l10n.dailyGoal.toLowerCase(),
-        'icon': Icons.self_improvement,
-        'color': Colors.purple.shade100,
-        'iconColor': Colors.purple,
-      },
-      {
-        'title': l10n.sleep + ' ' + l10n.better,
-        'subtitle': l10n.sleep +
-            ' 8 ' +
-            l10n.hours +
-            ' ' +
-            l10n.dailyGoal.toLowerCase(),
-        'icon': Icons.nightlight,
-        'color': Colors.indigo.shade100,
-        'iconColor': Colors.indigo,
-      },
-    ];
+    if (_challenges.isEmpty) {
+      return Center(
+        child: Text(
+          'No challenges available',
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey.shade600,
+          ),
+        ),
+      );
+    }
 
     return ListView.separated(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: challenges.length,
+      itemCount: _challenges.length,
       separatorBuilder: (context, index) => const SizedBox(height: 16),
       itemBuilder: (context, index) {
-        final challenge = challenges[index];
+        final challenge = _challenges[index];
+        final isJoined = _userChallenges.containsKey(challenge.id);
+
         return Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -213,12 +307,12 @@ class _ChallengeScreenState extends State<ChallengeScreen> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: challenge['color'] as Color,
+                  color: challenge.getColor().withOpacity(0.2),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
-                  challenge['icon'] as IconData,
-                  color: challenge['iconColor'] as Color,
+                  challenge.getIcon(),
+                  color: challenge.getColor(),
                 ),
               ),
               const SizedBox(width: 16),
@@ -227,14 +321,14 @@ class _ChallengeScreenState extends State<ChallengeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      challenge['title'] as String,
+                      challenge.name,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
-                      challenge['subtitle'] as String,
+                      challenge.description,
                       style: TextStyle(
                         color: Colors.grey.shade600,
                         fontSize: 14,
@@ -243,18 +337,19 @@ class _ChallengeScreenState extends State<ChallengeScreen> {
                   ],
                 ),
               ),
-              ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
+              if (!isJoined)
+                ElevatedButton(
+                  onPressed: () => _joinChallenge(challenge.id!),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    minimumSize: const Size(80, 36),
                   ),
-                  minimumSize: const Size(80, 36),
+                  child: Text(l10n.join),
                 ),
-                child: Text(l10n.join),
-              ),
             ],
           ),
         );

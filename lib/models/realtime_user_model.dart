@@ -7,9 +7,10 @@ class RealtimeUserModel {
   final String gender;
   final int height;
   final String nickname;
-  final String profileImage;
+  final String profileImage; // Keeping for database compatibility
   final int weight;
   final int lastUpdated;
+  final bool isAdmin;
 
   RealtimeUserModel({
     required this.id,
@@ -20,9 +21,10 @@ class RealtimeUserModel {
     required this.gender,
     required this.height,
     required this.nickname,
-    required this.profileImage,
+    this.profileImage = '', // Default to empty string
     required this.weight,
     required this.lastUpdated,
+    this.isAdmin = false,
   });
 
   // Convert from Realtime Database data
@@ -37,9 +39,10 @@ class RealtimeUserModel {
       gender: data['gender'] ?? '',
       height: data['height'] ?? 0,
       nickname: data['nickname'] ?? '',
-      profileImage: data['profileImage'] ?? '',
+      profileImage: '', // Always set to empty string
       weight: data['weight'] ?? 0,
       lastUpdated: data['lastUpdated'] ?? 0,
+      isAdmin: data['isAdmin'] ?? false,
     );
   }
 
@@ -52,8 +55,9 @@ class RealtimeUserModel {
       'gender': gender,
       'height': height,
       'nickname': nickname,
-      'profileImage': profileImage,
+      'profileImage': '', // Always send empty string
       'weight': weight,
+      'isAdmin': isAdmin,
     };
 
     // Only include password if it's provided

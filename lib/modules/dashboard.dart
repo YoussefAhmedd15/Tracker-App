@@ -107,18 +107,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             Row(
                               children: [
                                 CircleAvatar(
-                                  radius: 30,
-                                  backgroundImage:
-                                      _user!.profileImage.isNotEmpty
-                                          ? NetworkImage(_user!.profileImage)
-                                          : null,
-                                  child: _user!.profileImage.isEmpty
-                                      ? Icon(
-                                          Icons.person,
-                                          size: 40,
-                                          color: AppColors.textSecondary,
-                                        )
-                                      : null,
+                                  radius: 20,
+                                  backgroundColor: Colors.blue.shade200,
+                                  child: Text(
+                                    _user?.fullName.isNotEmpty == true ? _user!.fullName[0].toUpperCase() : 'U',
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                                 ),
                                 const SizedBox(width: 16),
                                 Column(

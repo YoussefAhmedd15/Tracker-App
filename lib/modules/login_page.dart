@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tracker/layout/auth_layout.dart';
 import 'package:tracker/main.dart';
+import 'package:tracker/modules/admin_page.dart';
 import 'package:tracker/modules/health_dashboard.dart';
 import 'package:tracker/shared/network/remote/user_service.dart';
 import 'package:tracker/shared/styles/colors.dart';
@@ -55,8 +56,40 @@ class _LoginPageState extends State<LoginPage> {
             // Store user ID in SharedPreferences
             final prefs = await SharedPreferences.getInstance();
             await prefs.setString('current_user_id', user.id);
+            await prefs.setBool('is_admin', user.isAdmin);
 
-            // Login successful, navigate to health dashboard
+            if (user.isAdmin) {
+              // Show admin option
+              final adminMode = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Admin Access'),
+                  content: const Text('Would you like to enter admin mode?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      child: const Text('No, continue as user'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      child: const Text('Yes, enter admin mode'),
+                    ),
+                  ],
+                ),
+              );
+
+              if (adminMode == true) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AdminPage(),
+                  ),
+                );
+                return;
+              }
+            }
+
+            // Login as regular user
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(

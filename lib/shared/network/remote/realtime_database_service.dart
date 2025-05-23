@@ -3,6 +3,7 @@ import '../../../models/realtime_user_model.dart';
 import '../../../models/realtime_workout_model.dart';
 import '../../../models/realtime_activity_model.dart';
 import '../../../models/realtime_weight_record_model.dart';
+import '../../../models/realtime_challenge_model.dart';
 
 class RealtimeDatabaseService {
   final DatabaseReference _database = FirebaseDatabase.instance.ref();
@@ -505,27 +506,41 @@ class RealtimeDatabaseService {
       final snapshot = await workoutsRef.get();
 
       if (snapshot.exists) {
-        // Check if the value is a Map, not just a boolean placeholder
+        // Check if the value is a Map and contains actual workout data
         if (snapshot.value is Map) {
           final workoutsData = snapshot.value as Map<dynamic, dynamic>;
+          bool hasWorkouts = false;
           workoutsData.forEach((key, value) {
-            // Ensure each entry is also a map
-            if (value is Map) {
+            // Ensure each entry is also a map and contains workout data
+            if (value is Map && value.containsKey('name')) {
+              hasWorkouts = true;
               workouts.add(RealtimeWorkoutModel.fromRealtime(key, value));
             }
           });
+          
+          // Only create sample workouts if there are no valid workouts
+          if (!hasWorkouts) {
+            await createSampleWorkouts();
+            // Fetch the workouts again after creating samples
+            final newSnapshot = await workoutsRef.get();
+            if (newSnapshot.exists && newSnapshot.value is Map) {
+              final newWorkoutsData = newSnapshot.value as Map<dynamic, dynamic>;
+              newWorkoutsData.forEach((key, value) {
+                if (value is Map && value.containsKey('name')) {
+                  workouts.add(RealtimeWorkoutModel.fromRealtime(key, value));
+                }
+              });
+            }
+          }
         } else {
-          // If it's not a map (e.g., just a boolean), we need to initialize it properly
-          print(
-              'Workouts node exists but is not formatted correctly. Creating sample workouts.');
+          // If it's not a map, initialize with sample workouts
           await createSampleWorkouts();
-
           // Try to fetch again after creating samples
           final newSnapshot = await workoutsRef.get();
           if (newSnapshot.exists && newSnapshot.value is Map) {
             final workoutsData = newSnapshot.value as Map<dynamic, dynamic>;
             workoutsData.forEach((key, value) {
-              if (value is Map) {
+              if (value is Map && value.containsKey('name')) {
                 workouts.add(RealtimeWorkoutModel.fromRealtime(key, value));
               }
             });
@@ -533,15 +548,13 @@ class RealtimeDatabaseService {
         }
       } else {
         // Workouts node doesn't exist, create sample workouts
-        print('Workouts node does not exist. Creating sample workouts.');
         await createSampleWorkouts();
-
         // Try to fetch again after creating samples
         final newSnapshot = await workoutsRef.get();
         if (newSnapshot.exists && newSnapshot.value is Map) {
           final workoutsData = newSnapshot.value as Map<dynamic, dynamic>;
           workoutsData.forEach((key, value) {
-            if (value is Map) {
+            if (value is Map && value.containsKey('name')) {
               workouts.add(RealtimeWorkoutModel.fromRealtime(key, value));
             }
           });
@@ -554,7 +567,7 @@ class RealtimeDatabaseService {
     return workouts;
   }
 
-  // Add method to create sample workouts
+  // Create sample workouts with diverse options
   Future<void> createSampleWorkouts() async {
     try {
       final workoutsRef = FirebaseDatabase.instance.ref().child('workouts');
@@ -566,54 +579,53 @@ class RealtimeDatabaseService {
         await workoutsRef.remove();
       }
 
-      // Sample workout 1: Full Body Workout
+      // Sample workout 1: HIIT Cardio
       final workout1 = RealtimeWorkoutModel(
         userId: 'admin',
-        name: 'Full Body Workout',
-        type: 'Strength',
-        duration: 45,
-        caloriesBurned: 350,
-        date: DateTime.now().millisecondsSinceEpoch,
-        exercises: [
-          RealtimeExerciseModel(name: 'Push-ups', sets: 3, reps: 15),
-          RealtimeExerciseModel(name: 'Squats', sets: 3, reps: 20),
-          RealtimeExerciseModel(name: 'Pull-ups', sets: 3, reps: 8),
-          RealtimeExerciseModel(name: 'Lunges', sets: 3, reps: 10),
-          RealtimeExerciseModel(name: 'Plank', sets: 3, reps: 1),
-        ],
-        timestamp: DateTime.now().millisecondsSinceEpoch,
-      );
-
-      // Sample workout 2: Cardio Blast
-      final workout2 = RealtimeWorkoutModel(
-        userId: 'admin',
-        name: 'Cardio Blast',
+        name: 'HIIT Cardio',
         type: 'Cardio',
         duration: 30,
         caloriesBurned: 400,
         date: DateTime.now().millisecondsSinceEpoch,
         exercises: [
-          RealtimeExerciseModel(name: 'Jumping Jacks', sets: 3, reps: 30),
-          RealtimeExerciseModel(name: 'Mountain Climbers', sets: 3, reps: 20),
-          RealtimeExerciseModel(name: 'Burpees', sets: 3, reps: 15),
-          RealtimeExerciseModel(name: 'High Knees', sets: 3, reps: 40),
+          RealtimeExerciseModel(name: 'High Knees', sets: 4, reps: 30),
+          RealtimeExerciseModel(name: 'Mountain Climbers', sets: 4, reps: 20),
+          RealtimeExerciseModel(name: 'Burpees', sets: 4, reps: 10),
+          RealtimeExerciseModel(name: 'Jump Rope', sets: 4, reps: 50),
         ],
         timestamp: DateTime.now().millisecondsSinceEpoch,
       );
 
-      // Sample workout 3: Core Crusher
-      final workout3 = RealtimeWorkoutModel(
+      // Sample workout 2: Upper Body Strength
+      final workout2 = RealtimeWorkoutModel(
         userId: 'admin',
-        name: 'Core Crusher',
-        type: 'Core',
-        duration: 20,
-        caloriesBurned: 250,
+        name: 'Upper Body Strength',
+        type: 'Strength',
+        duration: 45,
+        caloriesBurned: 300,
         date: DateTime.now().millisecondsSinceEpoch,
         exercises: [
-          RealtimeExerciseModel(name: 'Crunches', sets: 3, reps: 25),
-          RealtimeExerciseModel(name: 'Russian Twists', sets: 3, reps: 20),
-          RealtimeExerciseModel(name: 'Leg Raises', sets: 3, reps: 15),
-          RealtimeExerciseModel(name: 'Plank', sets: 3, reps: 1),
+          RealtimeExerciseModel(name: 'Push-ups', sets: 3, reps: 15),
+          RealtimeExerciseModel(name: 'Dumbbell Rows', sets: 3, reps: 12),
+          RealtimeExerciseModel(name: 'Shoulder Press', sets: 3, reps: 12),
+          RealtimeExerciseModel(name: 'Tricep Dips', sets: 3, reps: 15),
+        ],
+        timestamp: DateTime.now().millisecondsSinceEpoch,
+      );
+
+      // Sample workout 3: Lower Body Power
+      final workout3 = RealtimeWorkoutModel(
+        userId: 'admin',
+        name: 'Lower Body Power',
+        type: 'Strength',
+        duration: 50,
+        caloriesBurned: 350,
+        date: DateTime.now().millisecondsSinceEpoch,
+        exercises: [
+          RealtimeExerciseModel(name: 'Squats', sets: 4, reps: 15),
+          RealtimeExerciseModel(name: 'Lunges', sets: 3, reps: 12),
+          RealtimeExerciseModel(name: 'Calf Raises', sets: 3, reps: 20),
+          RealtimeExerciseModel(name: 'Glute Bridges', sets: 3, reps: 15),
         ],
         timestamp: DateTime.now().millisecondsSinceEpoch,
       );
@@ -702,6 +714,137 @@ class RealtimeDatabaseService {
     } catch (e) {
       print('Error saving workout progress: $e');
       throw e;
+    }
+  }
+
+  // === CHALLENGE OPERATIONS ===
+
+  // Create challenge
+  Future<String?> createChallenge(RealtimeChallengeModel challenge) async {
+    try {
+      print('Starting to create challenge: ${challenge.name}');
+      
+      // First verify the challenges node exists
+      final challengesRef = _database.child('challenges');
+      final snapshot = await challengesRef.get();
+      if (!snapshot.exists) {
+        print('Challenges node does not exist, creating it...');
+        await challengesRef.set({
+          'initialized': true,
+          'timestamp': ServerValue.timestamp,
+        });
+      }
+      
+      // Create the new challenge
+      final newChallengeRef = challengesRef.push();
+      final challengeData = {
+        ...challenge.toMap(),
+        'timestamp': ServerValue.timestamp,
+      };
+      
+      print('Saving challenge data: $challengeData');
+      await newChallengeRef.set(challengeData);
+      
+      print('Successfully created challenge with ID: ${newChallengeRef.key}');
+      return newChallengeRef.key;
+    } catch (e) {
+      print('Error creating challenge: $e');
+      throw e;
+    }
+  }
+
+  // Get all challenges with improved error handling and logging
+  Future<List<RealtimeChallengeModel>> getAllChallenges() async {
+    try {
+      print('Fetching all challenges...');
+      final snapshot = await _database.child('challenges').get();
+      
+      if (!snapshot.exists) {
+        print('Challenges node does not exist');
+        return [];
+      }
+
+      print('Challenges data received: ${snapshot.value}');
+      
+      if (snapshot.value is! Map) {
+        print('Invalid challenges data format: ${snapshot.value.runtimeType}');
+        return [];
+      }
+
+      final challengesMap = snapshot.value as Map<dynamic, dynamic>;
+      
+      // Filter out the initialization entry
+      final filteredChallenges = challengesMap.entries.where((entry) {
+        return entry.key != 'initialized' && entry.value is Map;
+      });
+
+      final challenges = filteredChallenges.map((entry) {
+        return RealtimeChallengeModel.fromRealtime(
+          entry.key.toString(),
+          entry.value as Map<dynamic, dynamic>,
+        );
+      }).toList();
+
+      print('Successfully parsed ${challenges.length} challenges');
+      return challenges;
+    } catch (e) {
+      print('Error getting challenges: $e');
+      return [];
+    }
+  }
+
+  // Update challenge
+  Future<void> updateChallenge(String challengeId, Map<String, dynamic> challengeData) async {
+    try {
+      await _database.child('challenges/$challengeId').update({
+        ...challengeData,
+        'timestamp': ServerValue.timestamp,
+      });
+      print('Updated challenge with ID: $challengeId');
+    } catch (e) {
+      print('Error updating challenge: $e');
+      throw e;
+    }
+  }
+
+  // Delete challenge
+  Future<void> deleteChallenge(String challengeId) async {
+    try {
+      await _database.child('challenges/$challengeId').remove();
+      print('Deleted challenge with ID: $challengeId');
+    } catch (e) {
+      print('Error deleting challenge: $e');
+      throw e;
+    }
+  }
+
+  // Join challenge
+  Future<void> joinChallenge(String userId, String challengeId) async {
+    try {
+      final userChallengeRef = _database.child('user_challenges/$userId/$challengeId');
+      await userChallengeRef.set({
+        'joinedAt': ServerValue.timestamp,
+        'progress': 0,
+        'status': 'active',
+      });
+      print('User $userId joined challenge $challengeId');
+    } catch (e) {
+      print('Error joining challenge: $e');
+      throw e;
+    }
+  }
+
+  // Get user's challenges
+  Future<Map<String, dynamic>> getUserChallenges(String userId) async {
+    try {
+      final snapshot = await _database.child('user_challenges/$userId').get();
+      if (snapshot.exists) {
+        return Map<String, dynamic>.from(snapshot.value as Map);
+      }
+      return {};
+    } catch (e) {
+      print('Error getting user challenges: $e');
+      return {};
     }
   }
 }

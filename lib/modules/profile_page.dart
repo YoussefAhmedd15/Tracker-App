@@ -90,32 +90,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     ? const CircularProgressIndicator()
                     : Column(
                         children: [
-                          Container(
-                            width: 90,
-                            height: 90,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.blue.shade200,
-                              image: _user?.profileImage != null &&
-                                      _user!.profileImage.isNotEmpty
-                                  ? DecorationImage(
-                                      image: NetworkImage(_user!.profileImage),
-                                      fit: BoxFit.cover,
-                                    )
-                                  : null,
-                            ),
-                            child: _user?.profileImage == null ||
-                                    _user!.profileImage.isEmpty
-                                ? const Icon(Icons.person,
-                                    size: 45, color: Colors.white)
-                                : null,
-                          ),
+                          _buildProfileHeader(),
                           const SizedBox(height: 12),
-                          Text(
-                            '${l10n.hello} ${_user?.nickname ?? _user?.fullName?.split(' ').first ?? 'User'}',
-                            style: const TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.w600),
-                          ),
                           Text(
                             _user?.email ?? 'user@example.com',
                             style: const TextStyle(color: Colors.grey),
@@ -204,6 +180,38 @@ class _ProfilePageState extends State<ProfilePage> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildProfileHeader() {
+    final userName = _user?.nickname ?? _user?.fullName?.split(' ').first ?? 'User';
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 24),
+      child: Column(
+        children: [
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              CircleAvatar(
+                radius: 50,
+                backgroundColor: Colors.blue.shade200,
+                child: Text(
+                  userName.isNotEmpty ? userName[0].toUpperCase() : 'U',
+                  style: const TextStyle(
+                    fontSize: 40,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              // Optional edit button removed
+            ],
+          ),
+          const SizedBox(height: 16),
+          // ... rest of the method
+        ],
       ),
     );
   }

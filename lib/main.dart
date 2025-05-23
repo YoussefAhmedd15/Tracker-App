@@ -32,6 +32,8 @@ void main() async {
     final realtimeDatabaseService = RealtimeDatabaseService();
     await realtimeDatabaseService.initializeDatabase();
 
+    await createSampleData();
+
     print('Firebase initialized successfully');
   } catch (e) {
     print('Error initializing Firebase: $e');
@@ -89,6 +91,7 @@ class MyApp extends StatelessWidget {
 Future<void> createSampleData() async {
   final databaseService = RealtimeDatabaseService();
   final userId = "123"; // Sample user ID
+  final adminId = "admin_123"; // Admin user ID
 
   try {
     // Create sample user
@@ -107,6 +110,25 @@ Future<void> createSampleData() async {
 
     await databaseService.createUser(userId, user);
     print('Sample user created');
+    
+    // Create admin user
+    final adminUser = RealtimeUserModel(
+      id: adminId,
+      email: 'admin@example.com',
+      password: 'admin123', // In a real app, use proper security measures
+      age: 35,
+      fullName: 'Admin User',
+      gender: 'male',
+      height: 175,
+      nickname: 'Admin',
+      profileImage: '',
+      weight: 70,
+      lastUpdated: DateTime.now().millisecondsSinceEpoch,
+      isAdmin: true,
+    );
+    
+    await databaseService.createUser(adminId, adminUser);
+    print('Admin user created');
 
     // Create a sample workout with proper exercise models
     final workout = RealtimeWorkoutModel(
